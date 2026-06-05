@@ -1,0 +1,3505 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Winning Eleven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #111018;
+    --bg-secondary: #181525;
+    --bg-card: #1e1a2c;
+    --bg-card2: #242038;
+    --border: rgba(212,168,58,0.11);
+    --border-light: rgba(212,168,58,0.2);
+    --gold: #c9a035;
+    --gold-light: #e6bc50;
+    --gold-muted: #9a7020;
+    --text-primary: #f0ebe2;
+    --text-secondary: #9a9080;
+    --text-muted: #58544f;
+    --olive: #4a5240;
+    --olive-light: #6b7560;
+    --bronze: #9a6e1c;
+    --slate: #2c2842;
+    --success: #3d7050;
+    --danger: #7c4848;
+    --nav-height: 64px;
+    --header-height: 60px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; overflow:hidden; }
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 2px; }
+
+  #header {
+    flex-shrink: 0;
+    height: var(--header-height);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    position: relative;
+    z-index: 10;
+  }
+  #header-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: contain;
+    object-position: center;
+    border: 1.5px solid var(--gold-muted);
+    flex-shrink: 0;
+    background: var(--bg-card2);
+    padding: 2px;
+  }
+  #header-brand h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-muted) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+  }
+  #header-brand p {
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  #header-user {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* header-avatar and header-logout-btn moved out of header */
+  .settings-logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border);
+    color: #c06060;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 0 0 12px 12px;
+  }
+  .settings-logout-btn:hover { background: rgba(192,80,80,0.07); }
+
+  #main {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+
+  .view { display: none; animation: fadeIn 0.3s ease; }
+  .view.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  #bottom-nav {
+    flex-shrink: 0;
+    height: var(--nav-height);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 4px;
+    position: relative;
+    z-index: 10;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 8px;
+  }
+  .nav-item svg { width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; transition: all 0.2s; }
+  .nav-item span { font-size: 9px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.2s; }
+  .nav-item.active svg { stroke: var(--gold); }
+  .nav-item.active span { color: var(--gold); }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .card-body { padding: 14px 16px; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 16px;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    color: #0f0f10;
+  }
+  .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--gold-muted);
+    color: var(--gold-light);
+  }
+  .btn-outline:hover { background: rgba(201,168,76,0.08); }
+  .btn-full { width: 100%; }
+  .btn-sm { padding: 7px 14px; font-size: 11px; }
+  .btn-danger { background: var(--danger); color: var(--text-primary); }
+  .btn-success { background: var(--success); color: var(--text-primary); }
+  .btn-ghost { background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-secondary); }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: var(--text-primary);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--gold-muted); }
+  .form-input::placeholder { color: var(--text-muted); }
+
+  #toast {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background: var(--bg-card);
+    border: 1px solid var(--gold-muted);
+    color: var(--gold-light);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 14px 16px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .back-btn svg { width: 16px; height: 16px; stroke: var(--gold); fill: none; stroke-width: 2; }
+
+  .page-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-primary);
+    padding: 0 16px 16px;
+  }
+  .page-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 0 16px;
+    margin-top: -10px;
+    margin-bottom: 14px;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  .badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .badge-live { background: rgba(180,60,60,0.25); color: #e07070; border: 1px solid rgba(180,60,60,0.3); }
+  .badge-upcoming { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+  .badge-done { background: rgba(80,80,80,0.3); color: var(--text-muted); border: 1px solid var(--border); }
+
+  .list-item {
+    display: flex;
+    align-items: center;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item:hover { background: rgba(255,255,255,0.03); }
+  .list-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .list-item-icon svg { width: 16px; height: 16px; stroke: var(--gold-muted); fill: none; stroke-width: 1.8; }
+  .list-item-main { flex: 1; min-width: 0; }
+  .list-item-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .list-item-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .list-item-right { display: flex; align-items: center; gap: 6px; margin-left: 8px; flex-shrink: 0; }
+  .chevron { width: 14px; height: 14px; stroke: var(--text-muted); fill: none; stroke-width: 2; }
+
+  .toggle-tabs {
+    display: flex;
+    background: var(--bg-card2);
+    border-radius: 8px;
+    padding: 3px;
+    margin: 0 16px 16px;
+  }
+  .toggle-tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .toggle-tab.active {
+    background: var(--bg-card);
+    color: var(--gold);
+    border: 1px solid var(--border);
+  }
+
+  .avatar {
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--slate);
+  }
+
+  .stats-row { display: flex; gap: 8px; }
+  .stat-box {
+    flex: 1;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .stat-val { font-size: 18px; font-weight: 800; color: var(--gold-light); line-height: 1; }
+  .stat-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+
+  .standings-table { width: 100%; border-collapse: collapse; }
+  .standings-table th {
+    font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 700; padding: 8px 10px;
+    text-align: center; border-bottom: 1px solid var(--border);
+  }
+  .standings-table th:first-child { text-align: left; }
+  .standings-table td {
+    font-size: 12px; color: var(--text-primary); font-weight: 500;
+    padding: 9px 10px; text-align: center; border-bottom: 1px solid var(--border);
+  }
+  .standings-table td:first-child { text-align: left; }
+  .standings-table tr:last-child td { border-bottom: none; }
+  .standings-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .st-rank { font-weight: 800; color: var(--gold); width: 24px; }
+  .st-name { font-weight: 600; }
+  .st-pts { font-weight: 800; color: var(--gold-light); }
+
+  /* ══════════════════════════════════════════════
+     MATCH CARD — premium esports vertical layout
+     Avatar + name stacked, large avatars, clear
+     header / body / footer zones like reference.
+  ══════════════════════════════════════════════ */
+  .match-feed-wrap { margin-top: 6px; display: flex; flex-direction: column; gap: 10px; }
+
+  .match-card {
+    background: #1a1726;
+    border: 1px solid rgba(212,168,58,0.18);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  /* Top shimmer line */
+  .match-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 5%, rgba(212,168,58,0.35) 40%, rgba(212,168,58,0.35) 60%, transparent 95%);
+  }
+
+  /* ── Zone 1: Tournament header ── */
+  .mc-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 14px 8px;
+    border-bottom: 1px solid rgba(212,168,58,0.1);
+    background: rgba(201,160,53,0.04);
+    position: relative;
+  }
+  /* flanking lines */
+  .mc-header::before, .mc-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,168,58,0.3));
+    max-width: 30px;
+  }
+  .mc-header::after {
+    background: linear-gradient(270deg, transparent, rgba(212,168,58,0.3));
+  }
+  .mc-tournament-name {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+  .mc-header-icon {
+    font-size: 11px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  /* ── Zone 2: Players body ── */
+  .mc-body {
+    display: flex;
+    align-items: center;
+    padding: 14px 10px 12px;
+    gap: 4px;
+  }
+
+  /* Each player: avatar centered, name below */
+  .mc-player {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 4px 6px 2px;
+    border-radius: 10px;
+    transition: background 0.15s;
+    min-width: 0;
+  }
+  .mc-player:hover { background: rgba(255,255,255,0.04); }
+
+  .mc-avatar-wrap {
+    position: relative;
+    width: 52px; height: 52px;
+    flex-shrink: 0;
+  }
+  .mc-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--slate);
+    border: 2px solid var(--gold-muted);
+    display: block;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 3px rgba(201,160,53,0.08);
+    transition: border-color 0.15s;
+  }
+  .mc-player:hover .mc-avatar { border-color: var(--gold); }
+
+  .mc-player-name {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.25;
+    word-break: break-word;
+    hyphens: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Middle: VS or score */
+  .mc-middle {
+    flex-shrink: 0;
+    width: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding-bottom: 22px; /* offset to align with avatar center */
+  }
+  .mc-vs {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: rgba(160,150,130,0.6);
+    text-transform: uppercase;
+    font-style: italic;
+    line-height: 1;
+  }
+  .mc-vs-slash {
+    display: block;
+    width: 1px;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, rgba(212,168,58,0.4), transparent);
+    margin: 3px auto;
+  }
+  .mc-score-display {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--gold-light);
+    letter-spacing: 2px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 16px rgba(230,188,80,0.35);
+  }
+
+  /* ── Zone 3: Footer — date / time / notes ── */
+  .mc-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    border-top: 1px solid rgba(212,168,58,0.1);
+    background: rgba(0,0,0,0.18);
+  }
+  .mc-footer-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+  }
+  .mc-footer-item + .mc-footer-item {
+    border-left: 1px solid rgba(212,168,58,0.1);
+  }
+  .mc-footer-icon {
+    opacity: 0.6;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .match-feed-empty {
+    padding: 16px 0 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* ── Legacy match card inner elements (tournament/completed detail views) ── */
+  .match-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px 7px;
+    border-bottom: 1px solid rgba(212,168,58,0.1);
+    background: rgba(201,160,53,0.04);
+  }
+  .match-meta::before, .match-meta::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,168,58,0.25));
+    max-width: 24px;
+  }
+  .match-meta::after { background: linear-gradient(270deg, transparent, rgba(212,168,58,0.25)); }
+  .match-tourney {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-align: center;
+  }
+  .match-date {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+    display: none; /* moved into footer */
+  }
+  .match-teams {
+    display: flex;
+    align-items: center;
+    padding: 14px 10px 12px;
+    gap: 4px;
+  }
+  .match-team {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 4px 6px 2px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .match-team:hover { background: rgba(255,255,255,0.04); }
+  .match-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--slate);
+    border: 2px solid var(--gold-muted);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 3px rgba(201,160,53,0.08);
+  }
+  .match-team-name {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.25;
+    word-break: break-word;
+    hyphens: auto;
+    width: 100%;
+  }
+  .match-vs {
+    flex-shrink: 0;
+    width: 48px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 900;
+    color: rgba(160,150,130,0.6);
+    text-transform: uppercase;
+    font-style: italic;
+    padding-bottom: 22px;
+  }
+  .match-score {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--gold-light);
+    letter-spacing: 2px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    width: 48px;
+    text-align: center;
+    text-shadow: 0 0 16px rgba(230,188,80,0.35);
+    padding-bottom: 22px;
+  }
+
+  /* My Matches section — borderless, part of page flow */
+  .my-matches-section { margin-top: 20px; }
+  .my-matches-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .my-matches-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .my-matches-list { margin-top: 0; }
+
+  .lb-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .lb-row:hover { background: rgba(255,255,255,0.025); }
+  .lb-rank { font-size: 13px; font-weight: 800; color: var(--gold); width: 28px; flex-shrink: 0; }
+  .lb-rank.top1 { color: #ffd700; }
+  .lb-rank.top2 { color: #c0c0c0; }
+  .lb-rank.top3 { color: #cd7f32; }
+  .lb-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border-light); flex-shrink: 0; margin-right: 12px; }
+  .lb-info { flex: 1; min-width: 0; }
+  .lb-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .lb-stats { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .lb-pts { font-size: 16px; font-weight: 800; color: var(--gold-light); flex-shrink: 0; }
+
+  .achievement-card {
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  /* ── Stats mini grid (player detail) ── */
+  .stats-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px 4px;
+    padding: 4px 2px 8px;
+  }
+  .smg-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-align: center;
+  }
+  .smg-val { font-size: 17px; font-weight: 800; color: var(--gold-light); line-height: 1.1; }
+  .smg-lbl { font-size: 8px; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; font-weight: 600; line-height: 1.3; }
+  .smg-divider { grid-column: 1 / -1; height: 1px; background: var(--border); }
+
+  /* ── Titles Won section ── */
+  .title-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(201,160,53,0.06);
+    border: 1px solid rgba(201,160,53,0.15);
+    border-radius: 9px;
+    margin-bottom: 6px;
+  }
+  .title-pill-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .title-pill-name { font-size: 12px; font-weight: 700; color: var(--text-primary); flex: 1; line-height: 1.3; }
+  .title-pill-pos {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .title-pill-pos.champion { background: rgba(201,160,53,0.2); color: var(--gold); border: 1px solid rgba(201,160,53,0.3); }
+  .title-pill-pos.runner { background: rgba(160,160,160,0.12); color: #aaa; border: 1px solid rgba(160,160,160,0.2); }
+  .title-pill-pos.third { background: rgba(154,110,28,0.15); color: var(--bronze); border: 1px solid rgba(154,110,28,0.25); }
+
+  /* ── Recent Form section ── */
+  .recent-form-row {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    padding: 4px 0 2px;
+  }
+  .rf-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border: 1px solid transparent;
+  }
+  .rf-pill.W { background: rgba(61,112,80,0.2); color: #6bcf8e; border-color: rgba(61,112,80,0.3); }
+  .rf-pill.D { background: rgba(100,100,130,0.2); color: #aaa8cc; border-color: rgba(100,100,130,0.3); }
+  .rf-pill.L { background: rgba(124,72,72,0.2); color: #e07878; border-color: rgba(124,72,72,0.3); }
+  .rf-pill-badge { font-size: 9px; font-weight: 800; letter-spacing: 0.5px; }
+  .rf-pill-score { font-size: 11px; font-weight: 800; }
+  .rf-pill-opp { font-size: 9px; font-weight: 500; opacity: 0.75; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ach-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(160,128,48,0.15));
+    border: 1.5px solid var(--gold-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+  .ach-title { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+  .ach-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .info-val { font-size: 12px; font-weight: 700; color: var(--text-primary); text-align: right; }
+
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .setting-item:last-child { border-bottom: none; }
+  .setting-item:hover { background: rgba(255,255,255,0.025); }
+  .setting-item-left { display: flex; align-items: center; gap: 12px; }
+  .setting-item-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-card2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+  .setting-item-icon svg { width: 15px; height: 15px; stroke: var(--gold-muted); fill: none; stroke-width: 1.8; }
+  .setting-item-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .setting-item-sub { font-size: 11px; color: var(--text-muted); }
+
+  .toggle-switch {
+    width: 42px; height: 24px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .toggle-switch.on { background: rgba(201,168,76,0.3); border-color: var(--gold-muted); }
+  .toggle-switch::after {
+    content: '';
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: all 0.2s;
+  }
+  .toggle-switch.on::after { left: 20px; background: var(--gold); }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .contact-link:hover { background: rgba(255,255,255,0.025); }
+  .contact-link-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .contact-link-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+  .hero-section {
+    background: linear-gradient(160deg, #1c1928 0%, #171520 55%, var(--bg-primary) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 22px 16px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-section > * { position: relative; z-index: 1; }
+
+  /* Logged-out hero */
+  .hero-tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    line-height: 1.25;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--gold-light) 60%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .hero-buttons { display: flex; gap: 10px; justify-content: center; }
+  .hero-btn-gold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    color: #0f0f10;
+    transition: all 0.2s;
+    box-shadow: 0 2px 10px rgba(201,160,53,0.25);
+  }
+  .hero-btn-gold:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,160,53,0.35); }
+  .hero-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1.5px solid var(--gold-muted);
+    background: rgba(201,160,53,0.05);
+    color: var(--gold-light);
+    transition: all 0.2s;
+  }
+  .hero-btn-outline:hover { background: rgba(201,160,53,0.12); border-color: var(--gold); }
+
+  /* Logged-in hero */
+  .hero-user-strip {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .hero-user-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold-muted);
+    flex-shrink: 0;
+    background: var(--slate);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  }
+  .hero-user-info { flex: 1; min-width: 0; }
+  .hero-welcome {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold-muted);
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .hero-username {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hero-quick-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .hqs-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .hqs-val {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .hqs-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .hqs-sep {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+    align-self: center;
+    flex-shrink: 0;
+  }
+
+  .tournament-banner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .tournament-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .tournament-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 16px;
+  }
+  .banner-presents { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
+  .banner-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .payment-box {
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .payment-method { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+  .payment-number { font-size: 20px; font-weight: 800; color: var(--gold-light); letter-spacing: 2px; }
+
+  .profile-hero {
+    background: linear-gradient(180deg, #1e1e22 0%, var(--bg-primary) 100%);
+    padding: 28px 16px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .profile-avatar-large {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid var(--gold-muted);
+    margin-bottom: 12px;
+  }
+  .profile-name { font-size: 20px; font-weight: 800; color: var(--text-primary); }
+  .profile-id { font-size: 11px; color: var(--text-muted); margin-top: 3px; letter-spacing: 0.5px; }
+
+  .player-hero {
+    position: relative;
+    height: 200px;
+    background: linear-gradient(135deg, #1a1d20 0%, #252830 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 20px;
+  }
+  .player-hero-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--gold-muted);
+    margin-bottom: 10px;
+  }
+  .player-hero-name { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+  .player-hero-rank { font-size: 11px; color: var(--gold); font-weight: 600; margin-top: 3px; }
+
+
+
+  .notice { background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.2); border-radius: 8px; padding: 12px 14px; }
+  .notice-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  .pb-nav { padding-bottom: 20px; }
+  .px-16 { padding: 0 16px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+  .text-center { text-align: center; }
+  .text-gold { color: var(--gold); }
+  .text-muted { color: var(--text-muted); }
+  .font-700 { font-weight: 700; }
+  .font-800 { font-weight: 800; }
+  .fs-12 { font-size: 12px; }
+  .fs-11 { font-size: 11px; }
+  .fs-13 { font-size: 13px; }
+
+  .rule-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .rule-section-title { font-size: 12px; font-weight: 800; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .rule-text { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+  .rule-list { list-style: none; }
+  .rule-list li { font-size: 12px; color: var(--text-secondary); line-height: 1.7; padding-left: 14px; position: relative; }
+  .rule-list li::before { content: '—'; position: absolute; left: 0; color: var(--gold-muted); }
+
+  .empty-state { text-align: center; padding: 36px 20px; color: var(--text-muted); font-size: 13px; }
+  .empty-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
+
+  .prize-highlight {
+    background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(160,128,48,0.08));
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .prize-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
+  .prize-amount { font-size: 28px; font-weight: 800; color: var(--gold-light); margin-top: 4px; }
+
+  .scroll-pad { padding-bottom: 24px; }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-state { text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 13px; }
+
+  /* ── Clickable player name links ── */
+  .player-link {
+    cursor: pointer;
+    color: inherit;
+    border-bottom: 1px dotted rgba(212,168,58,0.4);
+    transition: color 0.15s;
+    display: inline;
+  }
+  .player-link:hover { color: var(--gold); }
+
+  /* ── Approved Participants Section ── */
+  .approved-participants-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+  .approved-participants-header {
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .approved-participants-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .approved-participants-search {
+    width: 100%;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text-primary);
+    font-family: 'Manrope', sans-serif;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .approved-participants-search:focus { border-color: var(--gold-muted); }
+  .approved-participants-search::placeholder { color: var(--text-muted); }
+  .participant-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .participant-row:last-child { border-bottom: none; }
+  .participant-num {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--gold);
+    width: 20px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .participant-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+  }
+  .participant-check { font-size: 12px; color: #4caf50; flex-shrink: 0; }
+  .participant-you {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(201,168,76,0.15);
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.25);
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  /* ── Player Info collapsible section ── */
+  .pi-toggle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 11px 14px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    user-select: none;
+    transition: border-color 0.15s;
+  }
+  .pi-toggle-header:hover { border-color: var(--gold-muted); }
+  .pi-toggle-header-label { font-size: 12px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.5px; }
+  .pi-toggle-body {
+    background: var(--bg-card2);
+    border: 1px solid var(--border-light);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 4px 14px 10px;
+  }
+
+  /* ── Latest News ── */
+  .news-section { margin-top: 20px; }
+  .news-section-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .news-primary-banner { width: 100%; overflow: hidden; border-radius: 12px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-light); }
+  .news-primary-banner img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  .news-primary-overlay { padding: 11px 14px 14px; }
+  .news-primary-tag { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 5px; }
+  .news-primary-headline { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 800; color: var(--text-primary); line-height: 1.3; margin-bottom: 5px; }
+  .news-primary-summary { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+  .news-list { margin-top: 10px; display: flex; flex-direction: column; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .news-list-item { display: flex; gap: 12px; padding: 13px 14px; background: var(--bg-card); border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; align-items: flex-start; }
+  .news-list-item:last-child { border-bottom: none; }
+  .news-list-item:active { background: rgba(255,255,255,0.04); }
+  .news-list-thumb { width: 72px; height: 48px; border-radius: 7px; object-fit: cover; flex-shrink: 0; background: var(--slate); }
+  .news-list-body { flex: 1; min-width: 0; }
+  .news-list-headline { font-size: 12px; font-weight: 700; color: var(--text-primary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .news-list-summary { font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  /* News Detail */
+  .news-detail-hero { width: 100%; aspect-ratio: 16/9; overflow: hidden; background: var(--slate); }
+  .news-detail-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .news-detail-body { padding: 16px; }
+  .news-detail-headline { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; color: var(--text-primary); line-height: 1.3; margin-bottom: 8px; }
+  .news-detail-date { font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 14px; font-weight: 600; text-transform: uppercase; }
+  .news-detail-content { font-size: 13px; color: var(--text-secondary); line-height: 1.8; white-space: pre-line; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <img id="header-logo" src="https://i.postimg.cc/d1WK2sBS/22C47B3F-C5D7-4324-A8E7-191E5C1C857D.png" alt="WE Logo" onerror="this.style.background='var(--slate)'">
+    <div id="header-brand">
+      <h1>WINNING ELEVEN</h1>
+      <p>eFootball Community</p>
+    </div>
+    <div id="header-user"></div>
+  </div>
+
+  <div id="main">
+    <div id="view-home" class="view active">
+      <div id="home-content"></div>
+    </div>
+    <div id="view-tournaments" class="view">
+      <div id="tournaments-content"></div>
+    </div>
+    <div id="view-matches" class="view">
+      <div id="matches-content"></div>
+    </div>
+    <div id="view-leaderboard" class="view">
+      <div id="leaderboard-content"></div>
+    </div>
+    <div id="view-profile" class="view">
+      <div id="profile-content"></div>
+    </div>
+    <div id="view-signup" class="view"></div>
+    <div id="view-login" class="view"></div>
+    <div id="view-tournament-register" class="view"></div>
+    <div id="view-tournament-detail" class="view"></div>
+    <div id="view-player-detail" class="view"></div>
+    <div id="view-edit-profile" class="view"></div>
+    <div id="view-player-info" class="view"></div>
+    <div id="view-match-rules" class="view"></div>
+    <div id="view-contact" class="view"></div>
+    <div id="view-completed-detail" class="view"></div>
+    <div id="view-news-detail" class="view"></div>
+  </div>
+
+  <div id="bottom-nav">
+    <div class="nav-item active" id="nav-home" onclick="showTab('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" id="nav-tournaments" onclick="showTab('tournaments')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      <span>Tournaments</span>
+    </div>
+    <div class="nav-item" id="nav-matches" onclick="showTab('matches')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+      <span>Matches</span>
+    </div>
+    <div class="nav-item" id="nav-leaderboard" onclick="showTab('leaderboard')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Leaderboard</span>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="showTab('profile')">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profile</span>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ======================= FIREBASE INIT =======================
+const firebaseConfig = {
+  apiKey: "AIzaSyACb-b2O9V_wkF74C51_t6cOReLLr8QN4I",
+  authDomain: "fc-winning-eleven-782ba.firebaseapp.com",
+  projectId: "fc-winning-eleven-782ba",
+  storageBucket: "fc-winning-eleven-782ba.firebasestorage.app",
+  messagingSenderId: "190860997673",
+  appId: "1:190860997673:web:542b3fdb4d25b5c75a1838"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+let db = firebase.firestore();
+
+// ═══════════════════════════════════════════════════════════════════════
+// FORENSIC FIRESTORE READ INTERCEPTOR  (index.html — console only)
+// Identical proxy logic to admin.html.  All reads logged to console.
+// No UI panel — check the browser DevTools console.
+// Run: window.FS_DIAG_USER.report()  in the user-app console for summary.
+// ═══════════════════════════════════════════════════════════════════════
+const FS_DIAG_USER = {
+    sessionReads: 0,
+    byCollection: {},
+    bySource: {},
+    activeListeners: [],
+    recentEvents: [],
+    _nextId: 0,
+
+    _record(col, docCount, queryDesc, caller, kind) {
+        this.sessionReads += docCount;
+        if (!this.byCollection[col]) this.byCollection[col] = { total: 0 };
+        this.byCollection[col].total += docCount;
+        const sk = caller + '|' + col;
+        if (!this.bySource[sk]) this.bySource[sk] = { total: 0, count: 0, col, caller, kind };
+        this.bySource[sk].total += docCount;
+        this.bySource[sk].count++;
+        const ev = { time: new Date().toLocaleTimeString(), col, queryDesc, docCount, caller, kind, running: this.sessionReads };
+        this.recentEvents.push(ev);
+        if (this.recentEvents.length > 200) this.recentEvents.shift();
+        console.log(`[FS-READ-USER] +${docCount} | ${col} | ${kind} | ${queryDesc} | via ${caller} | session: ${this.sessionReads}`);
+    },
+
+    _registerListener(col, queryDesc, caller) {
+        const id = ++this._nextId;
+        const entry = { id, col, queryDesc, caller, fires: 0, totalDocs: 0, created: new Date().toLocaleTimeString() };
+        this.activeListeners.push(entry);
+        console.log(`[FS-LISTENER-USER] +NEW #${id} | ${col} | ${queryDesc} | caller: ${caller} | active: ${this.activeListeners.length}`);
+        return { id, entry };
+    },
+
+    _removeListener(id) {
+        const idx = this.activeListeners.findIndex(l => l.id === id);
+        if (idx >= 0) {
+            const l = this.activeListeners[idx];
+            console.log(`[FS-LISTENER-USER] -REMOVED #${id} | ${l.col} | fires: ${l.fires} | docs: ${l.totalDocs}`);
+            this.activeListeners.splice(idx, 1);
+        }
+    },
+
+    report() {
+        console.group('[FS-DIAG-USER] SESSION REPORT');
+        console.log('Total reads:', this.sessionReads);
+        console.log('Active listeners:', this.activeListeners.length);
+        console.group('By Collection');
+        Object.entries(this.byCollection).sort(([,a],[,b]) => b.total - a.total).forEach(([c,v]) => console.log(c + ':', v.total));
+        console.groupEnd();
+        console.group('Top Sources');
+        Object.values(this.bySource).sort((a,b) => b.total - a.total).slice(0,10).forEach(v => console.log(`${v.caller} → ${v.col}: ${v.total} reads (${v.count} calls)`));
+        console.groupEnd();
+        console.group('Active Listeners');
+        this.activeListeners.forEach(l => console.log(`#${l.id} ${l.col} | "${l.queryDesc}" | fires: ${l.fires} | docs: ${l.totalDocs} | via: ${l.caller}`));
+        console.groupEnd();
+        console.groupEnd();
+    }
+};
+
+function _userFsGetCaller() {
+    try {
+        const lines = new Error().stack.split('\n');
+        const skip = new Set(['Error','_userFsGetCaller','_userFsWrapQuery','_userFsWrapDoc','get','onSnapshot','collection','doc','where','orderBy','limit','startAfter','then','catch','async','Promise','Object']);
+        for (let i = 3; i < Math.min(lines.length, 12); i++) {
+            const m = lines[i].match(/at (?:async )?([A-Za-z_$][A-Za-z0-9_$]*)/);
+            if (m && !skip.has(m[1])) return m[1];
+        }
+        for (let i = 3; i < Math.min(lines.length, 8); i++) {
+            const t = lines[i].trim();
+            if (t && !t.includes('firestore') && !t.includes('firebase')) return t.slice(0, 60);
+        }
+    } catch(_) {}
+    return '(unknown)';
+}
+
+function _userFsWrapQuery(col, queryDesc, realRef) {
+    return new Proxy(realRef, {
+        get(target, prop) {
+            if (prop === 'onSnapshot') {
+                return function(cbOrOptions, cbOrError, optErr) {
+                    let cb, errCb;
+                    if (typeof cbOrOptions === 'function') { cb = cbOrOptions; errCb = cbOrError; }
+                    else { cb = cbOrError; errCb = optErr; }
+                    const caller = _userFsGetCaller();
+                    const { id, entry } = FS_DIAG_USER._registerListener(col, queryDesc, caller);
+                    const wrapped = (snap) => {
+                        const n = snap.docs ? snap.docs.length : (snap.exists ? 1 : 0);
+                        entry.fires++; entry.totalDocs += n;
+                        FS_DIAG_USER._record(col, n, queryDesc, caller, 'onSnapshot#' + id + ' fire#' + entry.fires);
+                        cb(snap);
+                    };
+                    const unsub = errCb
+                        ? target.onSnapshot(wrapped, (e) => { console.warn(`[FS-LISTENER-USER] #${id} error`, e); errCb(e); })
+                        : target.onSnapshot(wrapped);
+                    return function() { FS_DIAG_USER._removeListener(id); unsub(); };
+                };
+            }
+            if (prop === 'get') {
+                return async function() {
+                    const caller = _userFsGetCaller();
+                    const snap = await target.get();
+                    const n = snap.docs ? snap.docs.length : (snap.exists ? 1 : 0);
+                    FS_DIAG_USER._record(col, n, queryDesc, caller, 'get()');
+                    return snap;
+                };
+            }
+            if (['where','orderBy','limit','startAfter','startAt','endBefore','endAt'].includes(prop)) {
+                return function(...args) {
+                    const argStr = args.map(a => (typeof a === 'string' || typeof a === 'number' || typeof a === 'boolean') ? JSON.stringify(a) : typeof a).join(',');
+                    return _userFsWrapQuery(col, queryDesc + '.' + prop + '(' + argStr + ')', target[prop](...args));
+                };
+            }
+            if (prop === 'doc') {
+                return function(id) {
+                    return _userFsWrapDoc(col, queryDesc + '/doc(' + (id||'') + ')', target.doc(id));
+                };
+            }
+            const val = target[prop];
+            return typeof val === 'function' ? val.bind(target) : val;
+        }
+    });
+}
+
+function _userFsWrapDoc(col, queryDesc, realRef) {
+    return new Proxy(realRef, {
+        get(target, prop) {
+            if (prop === 'get') {
+                return async function() {
+                    const caller = _userFsGetCaller();
+                    const snap = await target.get();
+                    FS_DIAG_USER._record(col, snap.exists ? 1 : 0, queryDesc, caller, 'getDoc()');
+                    return snap;
+                };
+            }
+            if (prop === 'onSnapshot') {
+                return function(cbOrOptions, cbOrError, optErr) {
+                    let cb, errCb;
+                    if (typeof cbOrOptions === 'function') { cb = cbOrOptions; errCb = cbOrError; }
+                    else { cb = cbOrError; errCb = optErr; }
+                    const caller = _userFsGetCaller();
+                    const { id, entry } = FS_DIAG_USER._registerListener(col, queryDesc, caller);
+                    const wrapped = (snap) => {
+                        entry.fires++; entry.totalDocs += snap.exists ? 1 : 0;
+                        FS_DIAG_USER._record(col, snap.exists ? 1 : 0, queryDesc, caller, 'docSnapshot#' + id + ' fire#' + entry.fires);
+                        cb(snap);
+                    };
+                    const unsub = errCb ? target.onSnapshot(wrapped, (e) => { errCb(e); }) : target.onSnapshot(wrapped);
+                    return function() { FS_DIAG_USER._removeListener(id); unsub(); };
+                };
+            }
+            if (prop === 'collection') {
+                return function(subCol) {
+                    return _userFsWrapQuery(col + '/' + subCol, queryDesc + '/collection(' + subCol + ')', target.collection(subCol));
+                };
+            }
+            const val = target[prop];
+            return typeof val === 'function' ? val.bind(target) : val;
+        }
+    });
+}
+
+db = new Proxy(db, {
+    get(target, prop) {
+        if (prop === 'collection') {
+            return function(name) {
+                return _userFsWrapQuery(name, 'collection(' + name + ')', target.collection(name));
+            };
+        }
+        const val = target[prop];
+        return typeof val === 'function' ? val.bind(target) : val;
+    }
+});
+
+window.FS_DIAG_USER = FS_DIAG_USER;
+window.fsReportUser = () => FS_DIAG_USER.report();
+console.log('[FS-DIAG-USER] Firestore read interceptor active. Run fsReportUser() for summary.');
+// [FIXED] Explicitly use LOCAL persistence so user auth is always stored
+// in localStorage and is never contaminated by other tabs/apps on the
+// same origin that might use SESSION persistence.
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(e) {
+  console.warn('[Auth] Persistence error:', e);
+});
+
+// ======================= GLOBAL DATA =======================
+// Clean SVG silhouette used everywhere a user has no profile picture set.
+// Using a data URI avoids any external network request and never fails to load.
+const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23232630'/%3E%3Ccircle cx='40' cy='32' r='18' fill='%233d4156'/%3E%3Cellipse cx='40' cy='82' rx='30' ry='26' fill='%233d4156'/%3E%3C/svg%3E";
+
+let PLAYERS = [];
+let TOURNAMENTS = { upcoming: [], live: [], completed: [] };
+let MATCHES_UPCOMING = [];
+let MATCHES_RECENT = [];
+let STANDINGS = {};
+let COMPLETED_DETAIL = {};
+let APP_SETTINGS = {};
+
+let currentTab = 'home';
+let currentUser = null;
+let currentUserDoc = null;
+let viewStack = [];
+// [FIXED] Unsubscribe handle for the per-user Firestore doc listener.
+// Stored so we can cancel the old listener before creating a new one
+// when the auth state changes (prevents stale listeners from overwriting
+// the current user's name with data from a previous user's document).
+let unsubUserDoc = null;
+let approvedParticipantsUnsub = null;
+let approvedParticipantsAll = [];
+// [OPT] Track the tournament ID for which the approved-participants listener
+// is currently active. setupApprovedParticipantsListener() checks this before
+// tearing down and re-creating the listener. Since renderHome() is called from
+// multiple onSnapshot handlers (players, matches, tournaments, user-doc), this
+// guard prevents the listener from being cancelled and re-created on every
+// single match save — which would trigger a fresh read of ALL registration docs
+// each time. The listener is only recreated when the active tournament changes.
+let _lastParticipantTid = null;
+let NEWS_ITEMS = [];
+
+// ======================= UTILS =======================
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function getNotifSetting() { return localStorage.getItem('fcwe_notif') === '1'; }
+function setNotifSetting(v) { localStorage.setItem('fcwe_notif', v ? '1' : '0'); }
+function getPlayerInfo(uid) { try { return JSON.parse(localStorage.getItem('fcwe_playerinfo_' + uid) || 'null'); } catch(e) { return null; } }
+function savePlayerInfo(uid, p) { localStorage.setItem('fcwe_playerinfo_' + uid, JSON.stringify(p)); }
+
+// ======================= FIRESTORE REAL-TIME LISTENERS =======================
+
+// [OPT] Debounced renderHome for onSnapshot-triggered calls.
+// Multiple Firestore listeners (players, tournaments, matches, news) can fire
+// in rapid succession — e.g. when the admin saves a match and rank updates
+// cascade through the players collection. Without debouncing, renderHome()
+// runs once per listener fire, and each run unconditionally re-created the
+// approved-participants listener (now fixed with _lastParticipantTid, but
+// debouncing also prevents unnecessary DOM thrash from rapid re-renders).
+// Direct navigation calls (showTab) still call renderHome() immediately.
+let _renderHomeTimer = null;
+function renderHomeDebounced() {
+  if (_renderHomeTimer) clearTimeout(_renderHomeTimer);
+  _renderHomeTimer = setTimeout(() => {
+    _renderHomeTimer = null;
+    if (currentTab === 'home') renderHome();
+  }, 350);
+}
+
+function setupRealtimeListeners() {
+  // Players / Leaderboard
+  db.collection('players').orderBy('rank', 'asc').onSnapshot(snap => {
+    PLAYERS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (currentTab === 'leaderboard') renderLeaderboard();
+    if (currentTab === 'home') renderHomeDebounced();
+  });
+
+  // Tournaments
+  db.collection('tournaments').onSnapshot(snap => {
+    const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    TOURNAMENTS.upcoming = all.filter(t => t.status === 'upcoming');
+    TOURNAMENTS.live = all.filter(t => t.status === 'live');
+    TOURNAMENTS.completed = all.filter(t => t.status === 'completed');
+    if (currentTab === 'tournaments') renderTournaments();
+    if (currentTab === 'home') renderHomeDebounced();
+  });
+
+  // Matches — split into two queries to minimise reads.
+  //
+  // BEFORE: db.collection('matches').orderBy('date','desc').onSnapshot(...)
+  //   → Subscribed to ALL 220+ docs with no filter.
+  //   → Initial load cost = 220+ reads, growing every season.
+  //   → Listener re-fired on every finished-match edit (unnecessary for users).
+  //
+  // AFTER:
+  //   (A) Live onSnapshot on status='upcoming' only — users need real-time fixture info.
+  //       ~15-30 upcoming docs → initial cost ~20 reads, stays bounded forever.
+  //   (B) One-time .get() for finished matches — historical results are immutable.
+  //       Loaded once per session; no live listener needed.
+  //
+  db.collection('matches')
+    .where('status', '==', 'upcoming')
+    .onSnapshot(snap => {
+      MATCHES_UPCOMING = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (currentTab === 'matches') renderMatches();
+      if (currentTab === 'home') renderHomeDebounced();
+    }, () => {
+      // Fallback if composite index not ready
+      db.collection('matches')
+        .where('status', '==', 'upcoming')
+        .onSnapshot(snap => {
+          MATCHES_UPCOMING = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          if (currentTab === 'matches') renderMatches();
+          if (currentTab === 'home') renderHomeDebounced();
+        });
+    });
+
+  // Load finished matches once (historical data — no live listener needed)
+  db.collection('matches')
+    .where('status', '==', 'finished')
+    .orderBy('date', 'desc')
+    .get()
+    .then(snap => {
+      MATCHES_RECENT = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (currentTab === 'matches') renderMatches();
+      if (currentTab === 'home') renderHomeDebounced();
+    })
+    .catch(() => {
+      // Fallback without orderBy if index not ready
+      db.collection('matches')
+        .where('status', '==', 'finished')
+        .get()
+        .then(snap => {
+          MATCHES_RECENT = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          if (currentTab === 'matches') renderMatches();
+          if (currentTab === 'home') renderHomeDebounced();
+        });
+    });
+
+  // Standings
+  db.collection('standings').onSnapshot(snap => {
+    const raw = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Build STANDINGS object keyed by tournamentId, grouped by group name
+    const byTourney = {};
+    raw.forEach(s => {
+      if (!s.tournamentId) return;
+      if (!byTourney[s.tournamentId]) byTourney[s.tournamentId] = {};
+      const grp = s.group || 'Group A';
+      if (!byTourney[s.tournamentId][grp]) byTourney[s.tournamentId][grp] = [];
+      byTourney[s.tournamentId][grp].push(s);
+    });
+    STANDINGS = {};
+    for (const tid in byTourney) {
+      STANDINGS[tid] = Object.entries(byTourney[tid]).map(([group, rows]) => ({
+        group,
+        rows: rows.sort((a, b) => (b.pts || b.points || 0) - (a.pts || a.points || 0))
+      }));
+    }
+  });
+
+  // Settings
+  db.collection('settings').doc('app').onSnapshot(snap => {
+    if (snap.exists) {
+      APP_SETTINGS = snap.data();
+    }
+  });
+
+  // Latest News
+  db.collection('news').orderBy('order', 'asc').onSnapshot(snap => {
+    NEWS_ITEMS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (currentTab === 'home') renderHomeDebounced();
+  }, () => {
+    db.collection('news').onSnapshot(snap => {
+      NEWS_ITEMS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (currentTab === 'home') renderHomeDebounced();
+    });
+  });
+}
+
+// ======================= AUTH STATE =======================
+// [FIXED] onAuthStateChanged now properly cleans up the previous user's
+// Firestore realtime listener before attaching a new one. Without this,
+// stale listeners from previous sessions survive logout/login cycles and
+// can overwrite the current user's name with data from another user's doc
+// (the root cause of the "Joydip sees Mohibur's name" bug).
+auth.onAuthStateChanged(async user => {
+  // Cancel any existing per-user document listener before proceeding.
+  // This is the critical fix: without it, old listeners accumulate across
+  // login/logout cycles and fire against the wrong currentUser context.
+  if (unsubUserDoc) {
+    unsubUserDoc();
+    unsubUserDoc = null;
+  }
+
+  if (user) {
+    // Snapshot the UID at listener-creation time so the callback can
+    // verify it is still the active user when it eventually fires.
+    const capturedUid = user.uid;
+
+    // Fetch the Firestore user profile once (initial load)
+    try {
+      const doc = await db.collection('users').doc(capturedUid).get();
+      if (doc.exists) {
+        currentUserDoc = { id: doc.id, ...doc.data() };
+        currentUser = {
+          uid: capturedUid,
+          name: currentUserDoc.name || user.displayName || user.email,
+          email: user.email,
+          avatar: currentUserDoc.avatar || ''
+        };
+      } else {
+        currentUser = { uid: capturedUid, name: user.displayName || user.email, email: user.email, avatar: '' };
+      }
+    } catch(e) {
+      currentUser = { uid: capturedUid, name: user.displayName || user.email, email: user.email, avatar: '' };
+    }
+
+    // Attach a realtime listener for this user's document and save the
+    // unsubscribe handle. The UID guard inside the callback prevents a
+    // late-arriving snapshot from a stale listener from corrupting state.
+    unsubUserDoc = db.collection('users').doc(capturedUid).onSnapshot(snap => {
+      // [FIXED] Guard: only apply update if this is still the signed-in user.
+      // This prevents a snapshot that arrives after a user switch from
+      // overwriting the new user's display name with the old user's data.
+      if (!currentUser || currentUser.uid !== capturedUid) return;
+      if (snap.exists) {
+        currentUserDoc = { id: snap.id, ...snap.data() };
+        currentUser.name = currentUserDoc.name || currentUser.name;
+        currentUser.avatar = currentUserDoc.avatar || '';
+        updateHeader();
+        if (currentTab === 'profile') renderProfile();
+        if (currentTab === 'home') renderHomeDebounced();
+      }
+    });
+  } else {
+    currentUser = null;
+    currentUserDoc = null;
+  }
+  updateHeader();
+  renderTab(currentTab);
+});
+
+// ======================= NAV =======================
+function showTab(tab) {
+  currentTab = tab;
+  viewStack = [];
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  renderTab(tab);
+}
+
+function pushView(viewId, renderFn) {
+  viewStack.push({ prev: document.querySelector('.view.active').id });
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById(viewId);
+  el.classList.add('active');
+  renderFn(el);
+}
+
+function goBack() {
+  if (viewStack.length === 0) { showTab(currentTab); return; }
+  const prev = viewStack.pop();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById(prev.prev);
+  el.classList.add('active');
+  if (el.id === 'view-' + currentTab) renderTab(currentTab);
+}
+
+function renderTab(tab) {
+  if (tab === 'home') renderHome();
+  else if (tab === 'tournaments') renderTournaments();
+  else if (tab === 'matches') renderMatches();
+  else if (tab === 'leaderboard') renderLeaderboard();
+  else if (tab === 'profile') renderProfile();
+}
+
+function updateHeader() {
+  const el = document.getElementById('header-user');
+  el.innerHTML = '';
+}
+
+function logout() {
+  auth.signOut().then(() => {
+    currentUser = null;
+    currentUserDoc = null;
+    updateHeader();
+    showToast('Logged out successfully');
+    showTab('home');
+  });
+}
+
+// ======================= HOME =======================
+function renderHome() {
+  const el = document.getElementById('home-content');
+  const isLoggedIn = !!currentUser;
+  const liveTourneys = TOURNAMENTS.live;
+  const upcomingFirst = TOURNAMENTS.upcoming[0];
+  const allTours = [...TOURNAMENTS.upcoming, ...TOURNAMENTS.live, ...TOURNAMENTS.completed];
+  const activeTid = APP_SETTINGS && APP_SETTINGS.activeTournamentForParticipants;
+  const activeTournament = activeTid ? (allTours.find(t => t.id === activeTid) || upcomingFirst) : upcomingFirst;
+
+  el.innerHTML = `
+    <div class="hero-section">
+      ${isLoggedIn ? (() => {
+        const _lbSorted = getSortedPlayers();
+        const _myPlayer = _lbSorted.find(pl => pl.uid === currentUser.uid);
+        const _liveRank = _myPlayer ? (_lbSorted.indexOf(_myPlayer) + 1) : (currentUserDoc && currentUserDoc.stats && currentUserDoc.stats.rank ? currentUserDoc.stats.rank : null);
+        const _stats = currentUserDoc && currentUserDoc.stats ? currentUserDoc.stats : {};
+        const _played = _stats.matches || 0;
+        const _wins = _stats.wins || 0;
+        const _losses = _stats.losses || 0;
+        const _winRate = _stats.winRate ? _stats.winRate + '%' : '0%';
+        return `
+        <div class="hero-user-strip">
+          <img class="hero-user-avatar" src="${currentUser.avatar || DEFAULT_AVATAR}" alt="" onerror="this.src=DEFAULT_AVATAR">
+          <div class="hero-user-info">
+            <div class="hero-welcome">Welcome back</div>
+            <div class="hero-username">${escHtml(currentUser.name)}</div>
+            <div class="hero-quick-stats">
+              <div class="hqs-item"><div class="hqs-val">${_played}</div><div class="hqs-label">Played</div></div>
+              <div class="hqs-sep"></div>
+              <div class="hqs-item"><div class="hqs-val">${_wins}</div><div class="hqs-label">Win</div></div>
+              <div class="hqs-sep"></div>
+              <div class="hqs-item"><div class="hqs-val">${_losses}</div><div class="hqs-label">Loss</div></div>
+              <div class="hqs-sep"></div>
+              <div class="hqs-item"><div class="hqs-val">${_liveRank ? '#' + _liveRank : '—'}</div><div class="hqs-label">Rank</div></div>
+              <div class="hqs-sep"></div>
+              <div class="hqs-item"><div class="hqs-val">${_winRate}</div><div class="hqs-label">Win Rate</div></div>
+            </div>
+          </div>
+        </div>`;
+      })() : `
+        <div class="hero-tagline">BE A PART OF eFOOTBALL REVOLUTION</div>
+        <div class="hero-buttons">
+          <button class="hero-btn-gold" onclick="openSignup()">Sign Up</button>
+          <button class="hero-btn-outline" onclick="openLogin()">Login</button>
+        </div>
+      `}
+    </div>
+
+    <div style="padding: 0 16px;">
+      <div class="my-matches-section" id="my-matches-card">
+        <div class="my-matches-header">
+          <div class="my-matches-title">My Matches</div>
+        </div>
+        <div class="my-matches-list" id="my-matches-body">
+          ${isLoggedIn ? (() => {
+            const myUid = currentUser.uid;
+            const myName = currentUser.name;
+            const upcomingVisible = APP_SETTINGS.upcomingFixturesVisible !== false;
+            const myUpcoming = upcomingVisible ? MATCHES_UPCOMING.filter(m =>
+              (myUid && (m.player1Id === myUid || m.player2Id === myUid)) ||
+              (m.player1 === myName || m.player2 === myName)
+            ) : [];
+            return myUpcoming.length ? `<div class="match-feed-wrap">${myUpcoming.map(m => `
+              <div class="match-card">
+                <div class="mc-header">
+                  <span class="mc-header-icon">🏆</span>
+                  <span class="mc-tournament-name">${escHtml(m.tournament)}${m.notes ? '  ·  ' + escHtml(m.notes) : ''}</span>
+                </div>
+                <div class="mc-body">
+                  <div class="mc-player" onclick="openPlayerDetailByName('${escHtml(m.player1).replace(/'/g,'&#39;')}')">
+                    <img class="mc-avatar" src="${getMatchPlayerAvatar(m.player1,m.player1Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                    <div class="mc-player-name">${escHtml(m.player1)}</div>
+                  </div>
+                  <div class="mc-middle"><span class="mc-vs">VS</span></div>
+                  <div class="mc-player" onclick="openPlayerDetailByName('${escHtml(m.player2).replace(/'/g,'&#39;')}')">
+                    <img class="mc-avatar" src="${getMatchPlayerAvatar(m.player2,m.player2Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                    <div class="mc-player-name">${escHtml(m.player2)}</div>
+                  </div>
+                </div>
+                ${(m.date || m.time) ? `<div class="mc-footer">${m.date ? `<div class="mc-footer-item"><span class="mc-footer-icon">📅</span>${m.date}</div>` : ''}${m.time ? `<div class="mc-footer-item"><span class="mc-footer-icon">🕐</span>${m.time}</div>` : ''}</div>` : ''}
+              </div>
+            `).join('')}</div>` : `<div class="match-feed-empty">${upcomingVisible ? 'No upcoming matches scheduled' : 'Upcoming fixtures not yet published'}</div>`;
+          })() : `<div class="match-feed-empty">No upcoming matches scheduled</div>`}
+        </div>
+      </div>
+
+      ${upcomingFirst ? `
+        <div class="section-label" style="padding:0;margin-top:20px;margin-bottom:10px">Upcoming Tournament</div>
+        <div class="tournament-banner" onclick="openTournamentRegister('${upcomingFirst.id}')">
+          <img src="${upcomingFirst.banner || 'https://i.postimg.cc/j5QzZyqJ/IMG-7012.jpg'}" alt="${escHtml(upcomingFirst.name)}" onerror="this.style.background='var(--slate)'">
+          <div class="tournament-banner-overlay">
+            <div class="banner-presents">Winning Eleven Presents</div>
+            <div class="banner-title">${escHtml(upcomingFirst.name)}</div>
+            <button class="btn btn-gold btn-sm" onclick="event.stopPropagation();openTournamentRegister('${upcomingFirst.id}')">JOIN NOW</button>
+          </div>
+        </div>
+      ` : ''}
+
+      ${activeTournament && APP_SETTINGS.participantsSectionVisible !== false ? `
+        <div class="approved-participants-card" id="approved-participants-card">
+          <div class="approved-participants-header">
+            <div class="approved-participants-title" id="approved-participants-title">Loading Participants...</div>
+            <input class="approved-participants-search" id="approved-participants-search" placeholder="Search participant names..." oninput="filterApprovedParticipants()" type="text">
+          </div>
+          <div id="approved-participants-list"><div class="empty-state" style="padding:20px"><span class="spinner"></span></div></div>
+        </div>
+      ` : ''}
+
+      ${liveTourneys.length ? `
+        <div class="section-label" style="padding:0;margin-top:20px;margin-bottom:8px">Live Tournaments</div>
+        <div class="card">
+          ${liveTourneys.map(t => `
+            <div class="list-item" onclick="openTournamentDetail('${t.id}')">
+              <div class="list-item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+              <div class="list-item-main">
+                <div class="list-item-title">${escHtml(t.name)}</div>
+                <div class="list-item-sub">${t.prizepool || t.prize || ''} Prizepool</div>
+              </div>
+              <div class="list-item-right"><span class="badge badge-live">Live</span><svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${NEWS_ITEMS.length ? renderNewsSection() : ''}
+    </div>
+    <div style="height:24px"></div>
+  `;
+
+  if (activeTournament && APP_SETTINGS.participantsSectionVisible !== false) {
+    // [OPT] Only recreate the listener when the tournament changes.
+    // Previously this was called unconditionally every time renderHome() ran,
+    // which cancelled + re-created the listener on every match save, match
+    // delete, player update, and news change — causing a full re-read of ALL
+    // registration docs each time (N docs × M renders = potentially hundreds
+    // of unnecessary Firestore reads per session).
+    if (activeTournament.id !== _lastParticipantTid) {
+      _lastParticipantTid = activeTournament.id;
+      setupApprovedParticipantsListener(activeTournament.id, activeTournament.name);
+    }
+  } else if (!activeTournament || APP_SETTINGS.participantsSectionVisible === false) {
+    // If the section is hidden or there's no active tournament, tear down the
+    // listener and reset the guard so it's re-created when conditions change.
+    if (approvedParticipantsUnsub) {
+      approvedParticipantsUnsub();
+      approvedParticipantsUnsub = null;
+    }
+    _lastParticipantTid = null;
+  }
+}
+
+// ======================= LATEST NEWS =======================
+function renderNewsSection() {
+  const sorted = [...NEWS_ITEMS].sort((a, b) => (a.order || 0) - (b.order || 0));
+  const primary = sorted.find(n => n.isPrimary) || sorted[0];
+  const rest = sorted.filter(n => n.id !== (primary && primary.id));
+  if (!primary) return '';
+  return `
+    <div class="news-section">
+      <div class="news-section-label">Latest News</div>
+      <div class="news-primary-banner" onclick="openNewsDetail('${primary.id}')">
+        ${primary.imageUrl ? `<img src="${escHtml(primary.imageUrl)}" alt="${escHtml(primary.headline)}" onerror="this.style.background='var(--slate)'">` : ''}
+        <div class="news-primary-overlay">
+          <div class="news-primary-tag">Featured</div>
+          <div class="news-primary-headline">${escHtml(primary.headline)}</div>
+          ${primary.summary ? `<div class="news-primary-summary">${escHtml(primary.summary)}</div>` : ''}
+        </div>
+      </div>
+      ${rest.length ? `
+        <div class="news-list">
+          ${rest.map(n => `
+            <div class="news-list-item" onclick="openNewsDetail('${n.id}')">
+              <img class="news-list-thumb" src="${escHtml(n.imageUrl || '')}" alt="${escHtml(n.headline)}" onerror="this.style.background='var(--slate)'">
+              <div class="news-list-body">
+                <div class="news-list-headline">${escHtml(n.headline)}</div>
+                ${n.summary ? `<div class="news-list-summary">${escHtml(n.summary)}</div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function openNewsDetail(id) {
+  const n = NEWS_ITEMS.find(x => x.id === id);
+  if (!n) return;
+  pushView('view-news-detail', el => {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <div style="padding:16px 16px 0">
+          <button class="back-btn" onclick="goBack()">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back
+          </button>
+        </div>
+        ${n.imageUrl ? `
+          <div class="news-detail-hero">
+            <img src="${escHtml(n.imageUrl)}" alt="${escHtml(n.headline)}" onerror="this.style.background='var(--slate)'">
+          </div>
+        ` : ''}
+        <div class="news-detail-body">
+          <div class="news-detail-headline">${escHtml(n.headline)}</div>
+          ${n.publishedAt ? `<div class="news-detail-date">${escHtml(n.publishedAt)}</div>` : ''}
+          <div class="news-detail-content">${escHtml(n.content || n.summary || '')}</div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+// ======================= APPROVED PARTICIPANTS =======================
+function setupApprovedParticipantsListener(tid, tName) {
+  // Cancel any previous listener before creating a new one
+  if (approvedParticipantsUnsub) {
+    approvedParticipantsUnsub();
+    approvedParticipantsUnsub = null;
+  }
+  approvedParticipantsAll = [];
+
+  approvedParticipantsUnsub = db.collection('registrations')
+    .where('tournamentId', '==', tid)
+    .where('status', '==', 'approved')
+    .onSnapshot(snap => {
+      approvedParticipantsAll = snap.docs
+        .map(d => { const data = d.data(); return data.playerName ? { name: data.playerName, uid: data.uid || '' } : null; })
+        .filter(Boolean);
+      const titleEl = document.getElementById('approved-participants-title');
+      if (titleEl) titleEl.textContent = escHtml(tName) + ' – Approved Participants ✅';
+      filterApprovedParticipants();
+    }, () => {
+      // Fallback: try without compound index
+      db.collection('registrations')
+        .where('tournamentId', '==', tid)
+        .onSnapshot(snap => {
+          approvedParticipantsAll = snap.docs
+            .map(d => d.data())
+            .filter(r => r.status === 'approved')
+            .map(r => r.playerName ? { name: r.playerName, uid: r.uid || '' } : null)
+            .filter(Boolean);
+          const titleEl = document.getElementById('approved-participants-title');
+          if (titleEl) titleEl.textContent = escHtml(tName) + ' – Approved Participants ✅';
+          filterApprovedParticipants();
+        });
+    });
+}
+
+function filterApprovedParticipants() {
+  const searchEl = document.getElementById('approved-participants-search');
+  const query = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  const listEl = document.getElementById('approved-participants-list');
+  if (!listEl) return;
+
+  const filtered = query
+    ? approvedParticipantsAll.filter(p => (p.name || '').toLowerCase().includes(query))
+    : approvedParticipantsAll;
+
+  if (!filtered.length) {
+    listEl.innerHTML = `<div class="empty-state" style="padding:20px 16px">
+      <div class="empty-icon">🏟️</div>
+      <div style="font-size:12px;color:var(--text-muted)">${query ? 'No participants match your search' : 'No approved participants yet'}</div>
+    </div>`;
+    return;
+  }
+
+  const myUid = currentUser ? currentUser.uid : null;
+  listEl.innerHTML = filtered.map((p, i) => {
+    const isMe = myUid && p.uid && p.uid === myUid;
+    return `<div class="participant-row">
+      <span class="participant-num">${i + 1}</span>
+      <span class="participant-name">${escHtml(p.name)}</span>
+      ${isMe ? '<span class="participant-you">You</span>' : ''}
+      <span class="participant-check">✓</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleMyMatches() {
+  const body = document.getElementById('my-matches-body');
+  const chev = document.getElementById('my-matches-chevron');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    chev.innerHTML = '<polyline points="18 15 12 9 6 15"/>';
+  } else {
+    body.style.display = 'none';
+    chev.innerHTML = '<polyline points="6 9 12 15 18 9"/>';
+  }
+}
+
+// ======================= AUTH =======================
+function openSignup() {
+  pushView('view-signup', el => {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="page-title">Create Account</div>
+        <div class="page-subtitle">Join Winning Eleven community</div>
+        <div style="padding: 0 16px">
+          <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="su-name" placeholder="Enter your full name" type="text"></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="su-email" placeholder="Enter your email" type="email"></div>
+          <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="su-pass" placeholder="Create a password (min 6 chars)" type="password"></div>
+          <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" id="su-cpass" placeholder="Confirm your password" type="password"></div>
+          <div id="su-error" style="color:#e07070;font-size:12px;margin-bottom:10px;display:none"></div>
+          <button class="btn btn-gold btn-full mt-8" id="su-btn" onclick="doSignup()">SIGN UP</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function doSignup() {
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass = document.getElementById('su-pass').value;
+  const cpass = document.getElementById('su-cpass').value;
+  const errEl = document.getElementById('su-error');
+
+  if (!name || !email || !pass || !cpass) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
+  if (pass !== cpass) { errEl.textContent = 'Passwords do not match'; errEl.style.display = 'block'; return; }
+  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('su-btn');
+  btn.disabled = true; btn.textContent = 'Signing up...';
+  errEl.style.display = 'none';
+
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({ displayName: name });
+    await db.collection('users').doc(cred.user.uid).set({
+      name,
+      email,
+      avatar: '',
+      joined: new Date().toISOString().split('T')[0],
+      facebookId: '',
+      efootballId: '',
+      device: '',
+      whatsapp: '',
+      stats: { matches: 0, wins: 0, losses: 0, draws: 0, winRate: 0, hatTricks: 0, cleanSheets: 0, titles: 0, rank: 0 },
+      matchHistory: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // Auto-create a leaderboard entry in the 'players' collection.
+    // This ensures the new user appears on the leaderboard immediately with
+    // zero stats. The uid field links this entry back to their Firebase Auth
+    // account so the auto-stats engine can resolve them by UID rather than name.
+    try {
+      const existingPlayer = await db.collection('players')
+        .where('uid', '==', cred.user.uid).limit(1).get();
+      if (existingPlayer.empty) {
+        await db.collection('players').add({
+          name,
+          avatar: '',
+          uid: cred.user.uid,
+          rank: 0,   // placeholder — autoUpdateLeaderboardRanks() assigns real sequential ranks
+          played: 0, wins: 0, draws: 0, losses: 0,
+          goals: 0, hatTricks: 0, cleanSheets: 0,
+          titles: 0, winPct: 0, points: 0,
+          achievements: [],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    } catch(playerErr) {
+      // Non-fatal: entry will be created on first admin match save
+      console.warn('[Signup] Could not auto-create players entry:', playerErr);
+    }
+    showToast('Account created successfully');
+    viewStack = [];
+    showTab('home');
+  } catch(e) {
+    errEl.textContent = firebaseAuthError(e);
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'SIGN UP';
+  }
+}
+
+function openLogin(redirectTo) {
+  pushView('view-login', el => {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="page-title">WELCOME BACK</div>
+        <div class="page-subtitle">Login to your account</div>
+        <div style="padding: 0 16px">
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="li-email" placeholder="Enter your email" type="email"></div>
+          <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="li-pass" placeholder="Enter your password" type="password"></div>
+          <div id="li-error" style="color:#e07070;font-size:12px;margin-bottom:10px;display:none"></div>
+          <button class="btn btn-gold btn-full mt-8" id="li-btn" onclick="doLogin(${redirectTo ? `'${redirectTo}'` : 'null'})">LOGIN</button>
+          <div style="text-align:center;margin-top:16px"><span class="text-muted fs-12">Don't have an account? </span><span class="text-gold fs-12 font-700" style="cursor:pointer" onclick="goBack();setTimeout(openSignup,100)">Sign Up</span></div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function doLogin(redirectTo) {
+  const email = document.getElementById('li-email').value.trim();
+  const pass = document.getElementById('li-pass').value;
+  const errEl = document.getElementById('li-error');
+
+  if (!email || !pass) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('li-btn');
+  btn.disabled = true; btn.textContent = 'Logging in...';
+  errEl.style.display = 'none';
+
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    showToast('Login Successful');
+    viewStack = [];
+    if (redirectTo) { showTab('home'); setTimeout(() => openTournamentRegister(redirectTo), 300); }
+    else { showTab('home'); }
+  } catch(e) {
+    errEl.textContent = firebaseAuthError(e);
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'LOGIN';
+  }
+}
+
+function firebaseAuthError(e) {
+  const m = { 'auth/user-not-found': 'No account found with this email.', 'auth/wrong-password': 'Incorrect password.', 'auth/email-already-in-use': 'Email already registered.', 'auth/invalid-email': 'Invalid email address.', 'auth/weak-password': 'Password is too weak.', 'auth/too-many-requests': 'Too many attempts. Please try again later.', 'auth/invalid-credential': 'Invalid email or password.' };
+  return m[e.code] || e.message || 'An error occurred. Please try again.';
+}
+
+// ======================= TOURNAMENT REGISTER =======================
+function openTournamentRegister(tid) {
+  if (!currentUser) { openLogin(tid); return; }
+  const t = [...TOURNAMENTS.upcoming, ...TOURNAMENTS.live].find(x => x.id === tid);
+  if (!t) return;
+  pushView('view-tournament-register', el => {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="page-title">${escHtml(t.name)}</div>
+        <div class="page-subtitle" style="margin-bottom:16px">Start Date: ${t.startDate || 'TBA'}</div>
+        <div style="padding: 0 16px">
+          <div class="prize-highlight">
+            <div class="prize-label">Prize Pool</div>
+            <div class="prize-amount">${t.prizepool || t.prize || 'TBA'}</div>
+          </div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-body" style="padding:12px 16px">
+              <div class="info-row"><span class="info-key">Type</span><span class="info-val">${t.type || 'Solo'}</span></div>
+              <div class="info-row"><span class="info-key">Entry Fee</span><span class="info-val">${t.entryFee || t.fee || 'TBA'}</span></div>
+              <div class="info-row"><span class="info-key">Slots</span><span class="info-val">${t.slots || 'Open'}</span></div>
+            </div>
+          </div>
+          <div class="section-label" style="padding:0;margin-bottom:10px">Payment & Registration</div>
+          <div class="notice" style="margin-bottom:14px">
+            <div class="notice-text">Paste your FACEBOOK POST LINK below and secure your slot.</div>
+          </div>
+          <div class="payment-box">
+            <div class="payment-method">Send Money via bKash / Nagad</div>
+            <div class="payment-number">NO PAYMENT NEEDED</div>
+          </div>
+          <div class="form-group"><label class="form-label">FACEBOOK POST LINK</label><input class="form-input" id="txn-id" placeholder="Paste your Facebook post link"></div>
+          <div id="reg-error" style="color:#e07070;font-size:12px;margin-bottom:10px;display:none"></div>
+          <button class="btn btn-gold btn-full" id="reg-btn" onclick="doRegister('${tid}')">Confirm Registration</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function doRegister(tid) {
+  const txn = document.getElementById('txn-id').value.trim();
+  const errEl = document.getElementById('reg-error');
+  if (!txn) { errEl.textContent = 'Please enter your Facebook post link'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true; btn.textContent = 'Checking...';
+  errEl.style.display = 'none';
+
+  try {
+    // Block duplicate: check if user already has a pending or approved registration
+    const existingSnap = await db.collection('registrations')
+      .where('tournamentId', '==', tid)
+      .where('uid', '==', currentUser.uid)
+      .get();
+    const existing = existingSnap.docs.map(d => d.data());
+    const activeReg = existing.find(r => r.status === 'pending' || r.status === 'approved');
+    if (activeReg) {
+      const statusLabel = activeReg.status === 'approved' ? 'already approved' : 'already submitted (pending review)';
+      errEl.textContent = `You are ${statusLabel} for this tournament. Duplicate registrations are not allowed.`;
+      errEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Confirm Registration';
+      return;
+    }
+  } catch(e) {
+    // If the duplicate check fails (e.g. index not ready), allow the submission to proceed
+    console.warn('[doRegister] Duplicate check failed:', e);
+  }
+
+  btn.textContent = 'Submitting...';
+  const t = [...TOURNAMENTS.upcoming, ...TOURNAMENTS.live].find(x => x.id === tid);
+  try {
+    await db.collection('registrations').add({
+      tournamentId: tid,
+      tournamentName: t ? t.name : tid,
+      playerName: currentUser.name,
+      email: currentUser.email,
+      uid: currentUser.uid,
+      transactionId: txn,
+      status: 'pending',
+      submitted: new Date().toLocaleString(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Registration submitted successfully');
+    goBack();
+  } catch(e) {
+    errEl.textContent = 'Failed to submit. Please try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Confirm Registration';
+  }
+}
+
+// ======================= TOURNAMENT DETAIL =======================
+function openTournamentDetail(tid) {
+  const t = TOURNAMENTS.live.find(x => x.id === tid) || TOURNAMENTS.upcoming.find(x => x.id === tid);
+  if (!t) return;
+  let activeToggle = 'matches';
+
+  pushView('view-tournament-detail', el => {
+    function render() {
+      const groups = STANDINGS[tid] || [];
+      el.innerHTML = `
+        <div class="scroll-pad">
+          <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+          <div class="flex-between px-16" style="padding-bottom:12px">
+            <div><div style="font-size:16px;font-weight:800;color:var(--text-primary)">${escHtml(t.name)}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${t.prizepool || t.prize || ''} Prizepool</div></div>
+            <span class="badge badge-live">Live</span>
+          </div>
+          <div class="toggle-tabs">
+            <div class="toggle-tab ${activeToggle === 'matches' ? 'active' : ''}" onclick="window._dtToggle('matches')">Matches</div>
+            <div class="toggle-tab ${activeToggle === 'table' ? 'active' : ''}" onclick="window._dtToggle('table')">Group Stage / Table</div>
+          </div>
+          ${activeToggle === 'matches' ? renderDetailMatches(tid, t.name) : renderDetailTable(groups)}
+        </div>
+      `;
+    }
+    window._dtToggle = function(tab) { activeToggle = tab; render(); };
+    render();
+  });
+}
+
+function getMatchPlayerAvatar(name, id) {
+  var p = null;
+  if (id && typeof PLAYERS !== 'undefined') p = PLAYERS.find(function(x){ return x.id === id; });
+  if (!p && name && typeof PLAYERS !== 'undefined') p = PLAYERS.find(function(x){ return x.name === name; });
+  return (p && p.avatar) ? p.avatar : (typeof DEFAULT_AVATAR !== 'undefined' ? DEFAULT_AVATAR : '');
+}
+
+function renderDetailMatches(tid, tName) {
+  const upcoming = MATCHES_UPCOMING.filter(m => m.tournamentId === tid || m.tournament === tName);
+  const finished = MATCHES_RECENT.filter(m => m.tournamentId === tid || m.tournament === tName);
+  return `
+    <div style="padding: 0 16px">
+      ${APP_SETTINGS.upcomingFixturesVisible !== false && upcoming.length ? `<div class="section-label" style="padding:0;margin-bottom:8px;margin-top:4px">Upcoming</div>
+      ${upcoming.map(m => `
+        <div class="match-card">
+          <div class="match-meta"><span class="match-tourney">${escHtml(m.notes || m.tournament)}</span></div>
+          <div class="match-teams">
+            <div class="match-team" onclick="openPlayerDetailByName('${escHtml(m.player1).replace(/'/g,'&#39;')}')">
+              <img class="match-avatar" src="${getMatchPlayerAvatar(m.player1,m.player1Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+              <div class="match-team-name"><span class="player-link">${escHtml(m.player1)}</span></div>
+            </div>
+            <div class="match-vs">VS</div>
+            <div class="match-team" onclick="openPlayerDetailByName('${escHtml(m.player2).replace(/'/g,'&#39;')}')">
+              <img class="match-avatar" src="${getMatchPlayerAvatar(m.player2,m.player2Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+              <div class="match-team-name"><span class="player-link">${escHtml(m.player2)}</span></div>
+            </div>
+          </div>
+          ${(m.date || m.time) ? `<div class="mc-footer">${m.date ? `<div class="mc-footer-item"><span class="mc-footer-icon">📅</span>${m.date}</div>` : ''}${m.time ? `<div class="mc-footer-item"><span class="mc-footer-icon">🕐</span>${m.time}</div>` : ''}</div>` : ''}
+        </div>
+      `).join('')}` : ''}
+      ${finished.length ? `<div class="section-label" style="padding:0;margin-bottom:8px;margin-top:16px">Finished</div>
+      ${finished.map(m => {
+        const parts = (m.score || '0-0').split('-');
+        return `
+          <div class="match-card">
+            <div class="match-meta"><span class="match-tourney">${escHtml(m.notes || m.tournament)}</span></div>
+            <div class="match-teams">
+              <div class="match-team" onclick="openPlayerDetailByName('${escHtml(m.player1).replace(/'/g,'&#39;')}')">
+                <img class="match-avatar" src="${getMatchPlayerAvatar(m.player1,m.player1Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                <div class="match-team-name"><span class="player-link">${escHtml(m.player1)}</span></div>
+              </div>
+              <div class="match-score">${parts[0] || 0}–${parts[1] || 0}</div>
+              <div class="match-team" onclick="openPlayerDetailByName('${escHtml(m.player2).replace(/'/g,'&#39;')}')">
+                <img class="match-avatar" src="${getMatchPlayerAvatar(m.player2,m.player2Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                <div class="match-team-name"><span class="player-link">${escHtml(m.player2)}</span></div>
+              </div>
+            </div>
+            ${m.date ? `<div class="mc-footer"><div class="mc-footer-item"><span class="mc-footer-icon">📅</span>${m.date}</div></div>` : ''}
+          </div>
+        `;
+      }).join('')}` : ''}
+      ${!upcoming.length && !finished.length ? '<div class="empty-state text-muted">No matches yet</div>' : ''}
+    </div>
+  `;
+}
+
+function renderDetailTable(groups) {
+  if (!groups || !groups.length) return '<div class="empty-state"><div class="text-muted">No standings data</div></div>';
+  const tableFor = (rows) => `
+    <div style="overflow-x:auto">
+      <table class="standings-table">
+        <thead><tr><th>#</th><th>Player</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr></thead>
+        <tbody>
+          ${rows.map((s, i) => `
+            <tr>
+              <td class="st-rank">${i + 1}</td>
+              <td class="st-name"><span class="player-link" onclick="openPlayerDetailByName('${escHtml(s.player || s.name).replace(/'/g,'&#39;')}')">${escHtml(s.player || s.name)}</span></td>
+              <td>${s.played || s.mp || 0}</td><td>${s.wins || s.w || 0}</td><td>${s.draws || s.d || 0}</td><td>${s.losses || s.l || 0}</td>
+              <td>${s.goals || s.gf || 0}</td><td>${s.ga || 0}</td>
+              <td class="st-pts">${s.pts || s.points || 0}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  return `
+    <div style="padding: 0 16px">
+      ${groups.map(g => `
+        <div style="margin-bottom:16px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;padding-left:2px">${escHtml(g.group)}</div>
+          <div class="card">${tableFor(g.rows)}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ======================= COMPLETED DETAIL =======================
+function openCompletedDetail(tid) {
+  const t = TOURNAMENTS.completed.find(x => x.id === tid);
+  if (!t) return;
+  pushView('view-completed-detail', el => {
+    el.innerHTML = `<div class="loading-state"><span class="spinner"></span>Loading...</div>`;
+    // Fetch matches for completed tournament
+    db.collection('matches').where('tournamentId', '==', tid).get().then(snap => {
+      const matches = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(m => m.status === 'finished');
+      el.innerHTML = `
+        <div class="scroll-pad">
+          <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+          <div class="page-title">${escHtml(t.name)}</div>
+          <div style="padding: 0 16px">
+            <div class="prize-highlight">
+              <div class="prize-label">Winner</div>
+              <div style="font-size:18px;font-weight:800;color:var(--gold-light);margin-top:4px">🏆 ${escHtml(t.winner || 'TBA')}</div>
+            </div>
+            <div class="section-label" style="padding:0;margin-bottom:8px">Match Results</div>
+            ${matches.length ? matches.map(m => {
+              const parts = (m.score || '0-0').split('-');
+              return `
+                <div class="match-card">
+                  <div class="match-meta"><span class="match-tourney">${escHtml(m.notes || 'Match')}</span></div>
+                  <div class="match-teams">
+                    <div class="match-team" onclick="openPlayerDetailByName('${escHtml(m.player1).replace(/'/g,'&#39;')}')">
+                      <img class="match-avatar" src="${getMatchPlayerAvatar(m.player1,m.player1Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                      <div class="match-team-name"><span class="player-link">${escHtml(m.player1)}</span></div>
+                    </div>
+                    <div class="match-score">${parts[0] || 0}–${parts[1] || 0}</div>
+                    <div class="match-team" onclick="openPlayerDetailByName('${escHtml(m.player2).replace(/'/g,'&#39;')}')">
+                      <img class="match-avatar" src="${getMatchPlayerAvatar(m.player2,m.player2Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                      <div class="match-team-name"><span class="player-link">${escHtml(m.player2)}</span></div>
+                    </div>
+                  </div>
+                  <div class="mc-footer"><div class="mc-footer-item" style="justify-content:center;flex:none;padding:6px 14px"><span class="badge badge-done">Finished</span></div></div>
+                </div>
+              `;
+            }).join('') : '<div class="empty-state text-muted">No match data available</div>'}
+          </div>
+        </div>
+      `;
+    }).catch(() => {
+      el.innerHTML = `
+        <div class="scroll-pad">
+          <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+          <div class="page-title">${escHtml(t.name)}</div>
+          <div style="padding: 0 16px">
+            <div class="prize-highlight">
+              <div class="prize-label">Winner</div>
+              <div style="font-size:18px;font-weight:800;color:var(--gold-light);margin-top:4px">🏆 ${escHtml(t.winner || 'TBA')}</div>
+            </div>
+            <div class="empty-state text-muted">No match data available</div>
+          </div>
+        </div>
+      `;
+    });
+  });
+}
+
+// ======================= TOURNAMENTS TAB =======================
+function renderTournaments() {
+  const el = document.getElementById('tournaments-content');
+  el.innerHTML = `
+    <div class="scroll-pad">
+      <div style="padding: 16px 16px 0"><div style="font-size:20px;font-weight:800;color:var(--text-primary)">Tournaments</div></div>
+
+      ${TOURNAMENTS.upcoming.length ? `
+        <div class="section-label">Upcoming</div>
+        <div style="padding: 0 16px">
+          ${TOURNAMENTS.upcoming.map(t => `
+            <div class="card" style="margin-bottom:8px" onclick="openTournamentRegister('${t.id}')">
+              <div style="padding:13px 16px;display:flex;align-items:center;gap:12px">
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary)">${escHtml(t.name)}</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Start: ${t.startDate || 'TBA'} · Fee: ${t.entryFee || t.fee || 'TBA'}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+                  <span class="badge badge-upcoming">Upcoming</span>
+                  <svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${TOURNAMENTS.live.length ? `
+        <div class="section-label">Live Tournaments</div>
+        <div style="padding: 0 16px">
+          ${TOURNAMENTS.live.map(t => `
+            <div class="card" style="margin-bottom:8px" onclick="openTournamentDetail('${t.id}')">
+              <div style="padding:13px 16px;display:flex;align-items:center;gap:12px">
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary)">${escHtml(t.name)}</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Started: ${t.startDate || 'TBA'} · ${t.prizepool || t.prize || ''}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+                  <span class="badge badge-live">Live</span>
+                  <svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${TOURNAMENTS.completed.length ? `
+        <div class="section-label">Completed</div>
+        <div style="padding: 0 16px">
+          ${TOURNAMENTS.completed.map(t => `
+            <div class="card" style="margin-bottom:8px" onclick="openCompletedDetail('${t.id}')">
+              <div style="padding:13px 16px;display:flex;align-items:center;gap:12px">
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary)">${escHtml(t.name)}</div>
+                  <div style="font-size:11px;color:var(--gold-muted);margin-top:3px">Winner: ${escHtml(t.winner || 'TBA')}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+                  <span class="badge badge-done">Done</span>
+                  <svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${!TOURNAMENTS.upcoming.length && !TOURNAMENTS.live.length && !TOURNAMENTS.completed.length ? `
+        <div class="empty-state" style="margin-top:40px"><div class="empty-icon">🏆</div><div>No tournaments available yet</div></div>
+      ` : ''}
+    </div>
+  `;
+}
+
+// ======================= MATCHES TAB =======================
+function renderMatches() {
+  const el = document.getElementById('matches-content');
+  let activeTab = 'upcoming';
+  let searchQuery = '';
+  function render() {
+    const q = searchQuery.toLowerCase();
+    const upcomingFiltered = q
+      ? MATCHES_UPCOMING.filter(m =>
+          (m.player1 || '').toLowerCase().includes(q) ||
+          (m.player2 || '').toLowerCase().includes(q) ||
+          (m.tournament || '').toLowerCase().includes(q))
+      : MATCHES_UPCOMING;
+    const recentFiltered = q
+      ? MATCHES_RECENT.filter(m =>
+          (m.player1 || '').toLowerCase().includes(q) ||
+          (m.player2 || '').toLowerCase().includes(q) ||
+          (m.tournament || '').toLowerCase().includes(q))
+      : MATCHES_RECENT;
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <div style="padding:16px 16px 0"><div style="font-size:20px;font-weight:800;color:var(--text-primary)">Matches</div></div>
+        <div style="height:12px"></div>
+        <div class="toggle-tabs">
+          <div class="toggle-tab ${activeTab === 'upcoming' ? 'active' : ''}" onclick="window._matchToggle('upcoming')">Upcoming</div>
+          <div class="toggle-tab ${activeTab === 'recent' ? 'active' : ''}" onclick="window._matchToggle('recent')">Recent</div>
+        </div>
+        <div style="padding:0 16px;margin-top:12px">
+          <input id="match-search" type="text" value="${escHtml(searchQuery)}" placeholder="Search by player name…" oninput="window._matchSearch(this.value)" style="width:100%;background:var(--bg-card2);border:1px solid var(--border-light);border-radius:8px;padding:9px 14px;color:var(--text-primary);font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;outline:none;box-sizing:border-box;margin-bottom:10px;">
+        </div>
+        <div style="padding: 0 16px">
+          ${activeTab === 'upcoming' ? (APP_SETTINGS.upcomingFixturesVisible === false ? `<div class="empty-state text-muted">Upcoming fixtures are not yet available</div>` : upcomingFiltered.length ? `<div class="match-feed-wrap">${upcomingFiltered.map(m => `
+            <div class="match-card">
+              <div class="mc-header">
+                <span class="mc-header-icon">🏆</span>
+                <span class="mc-tournament-name">${escHtml(m.tournament)}${m.notes ? '  ·  ' + escHtml(m.notes) : ''}</span>
+              </div>
+              <div class="mc-body">
+                <div class="mc-player" onclick="openPlayerDetailByName('${escHtml(m.player1).replace(/'/g,'&#39;')}')">
+                  <img class="mc-avatar" src="${getMatchPlayerAvatar(m.player1,m.player1Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                  <div class="mc-player-name">${escHtml(m.player1)}</div>
+                </div>
+                <div class="mc-middle"><span class="mc-vs">VS</span></div>
+                <div class="mc-player" onclick="openPlayerDetailByName('${escHtml(m.player2).replace(/'/g,'&#39;')}')">
+                  <img class="mc-avatar" src="${getMatchPlayerAvatar(m.player2,m.player2Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                  <div class="mc-player-name">${escHtml(m.player2)}</div>
+                </div>
+              </div>
+              ${(m.date || m.time) ? `<div class="mc-footer">${m.date ? `<div class="mc-footer-item"><span class="mc-footer-icon">📅</span>${m.date}</div>` : ''}${m.time ? `<div class="mc-footer-item"><span class="mc-footer-icon">🕐</span>${m.time}</div>` : ''}</div>` : ''}
+            </div>
+          `).join('')}</div>` : `<div class="empty-state text-muted">${q ? 'No matches found for &ldquo;' + escHtml(searchQuery) + '&rdquo;' : 'No upcoming matches'}</div>`) :
+          (recentFiltered.length ? `<div class="match-feed-wrap">${recentFiltered.map(m => {
+            const parts = (m.score || '0-0').split('-');
+            return `
+              <div class="match-card">
+                <div class="mc-header">
+                  <span class="mc-header-icon">🏆</span>
+                  <span class="mc-tournament-name">${escHtml(m.tournament)}${m.notes ? '  ·  ' + escHtml(m.notes) : ''}</span>
+                </div>
+                <div class="mc-body">
+                  <div class="mc-player" onclick="openPlayerDetailByName('${escHtml(m.player1).replace(/'/g,'&#39;')}')">
+                    <img class="mc-avatar" src="${getMatchPlayerAvatar(m.player1,m.player1Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                    <div class="mc-player-name">${escHtml(m.player1)}</div>
+                  </div>
+                  <div class="mc-middle"><span class="mc-score-display">${parts[0] || 0}–${parts[1] || 0}</span></div>
+                  <div class="mc-player" onclick="openPlayerDetailByName('${escHtml(m.player2).replace(/'/g,'&#39;')}')">
+                    <img class="mc-avatar" src="${getMatchPlayerAvatar(m.player2,m.player2Id)}" onerror="this.onerror=null;this.src=getMatchPlayerAvatar('','')" alt="">
+                    <div class="mc-player-name">${escHtml(m.player2)}</div>
+                  </div>
+                </div>
+                ${m.date ? `<div class="mc-footer"><div class="mc-footer-item"><span class="mc-footer-icon">📅</span>${m.date}</div></div>` : ''}
+              </div>
+            `;
+          }).join('')}</div>` : `<div class="empty-state text-muted">${q ? 'No matches found for &ldquo;' + escHtml(searchQuery) + '&rdquo;' : 'No recent matches'}</div>`)}
+        </div>
+      </div>
+    `;
+    // Restore focus to search box if query is active
+    if (searchQuery) {
+      const inp = document.getElementById('match-search');
+      if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+    }
+  }
+  window._matchToggle = function(tab) { activeTab = tab; render(); };
+  window._matchSearch = function(val) { searchQuery = val; render(); };
+  render();
+}
+
+// ======================= LEADERBOARD SORT =======================
+// [FIXED] Sort players by actual live stats instead of the admin-written `rank`
+// field. The stored rank can be stale if Firebase limits slow down the admin's
+// batch writes, causing players with higher stats to appear below lower ones.
+// Criteria (descending unless noted): points → wins → goals → hat-tricks →
+// win rate → losses (ascending) → admin rank as final tiebreaker.
+function getSortedPlayers() {
+  return [...PLAYERS].sort((a, b) => {
+    // 1. Points (higher is better)
+    const pts = (b.points || 0) - (a.points || 0);
+    if (pts !== 0) return pts;
+    // 2. Wins (higher is better)
+    const wins = (b.wins || 0) - (a.wins || 0);
+    if (wins !== 0) return wins;
+    // 3. Goals (higher is better)
+    const goals = (b.goals || 0) - (a.goals || 0);
+    if (goals !== 0) return goals;
+    // 4. Hat-tricks (higher is better)
+    const ht = (b.hatTricks || 0) - (a.hatTricks || 0);
+    if (ht !== 0) return ht;
+    // 5. Win rate / winPct (higher is better)
+    const wr = (b.winPct || 0) - (a.winPct || 0);
+    if (wr !== 0) return wr;
+    // 6. Losses (lower is better)
+    const losses = (a.losses || 0) - (b.losses || 0);
+    if (losses !== 0) return losses;
+    // 7. Admin-assigned rank as final tiebreaker (lower number = better rank)
+    const ra = (a.rank > 0) ? a.rank : Infinity;
+    const rb = (b.rank > 0) ? b.rank : Infinity;
+    return ra - rb;
+  });
+}
+
+// ======================= LEADERBOARD =======================
+function renderLeaderboard() {
+  const el = document.getElementById('leaderboard-content');
+  el.innerHTML = `
+    <div style="padding:16px 16px 0">
+      <div style="font-size:20px;font-weight:800;color:var(--text-primary)">Leaderboard</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:3px">All time Rankings</div>
+    </div>
+    <div style="height:10px"></div>
+    <div style="padding:0 16px">
+      <input
+        id="lb-search"
+        type="text"
+        placeholder="Search player..."
+        oninput="filterLeaderboard(this.value)"
+        style="width:100%;background:var(--bg-card2);border:1px solid var(--border-light);border-radius:8px;padding:9px 14px;color:var(--text-primary);font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;outline:none;box-sizing:border-box;margin-bottom:10px;"
+      >
+    </div>
+    <div style="padding: 0 16px">
+      ${PLAYERS.length ? (() => {
+        // [FIXED] Sort by live stats so the display is always correct even when
+        // the admin's stored rank values are stale or haven't been recalculated yet.
+        const sorted = getSortedPlayers();
+        return `
+        <div class="card" id="lb-list">
+          ${sorted.map((p, i) => `
+            <div class="lb-row" onclick="openPlayerDetail('${p.id}')" data-name="${escHtml(p.name.toLowerCase())}">
+              <div class="lb-rank ${i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : ''}">${i + 1}</div>
+              <img class="lb-avatar" src="${p.avatar || DEFAULT_AVATAR}" alt="${escHtml(p.name)}" onerror="this.src=DEFAULT_AVATAR">
+              <div class="lb-info">
+                <div class="lb-name">${escHtml(p.name)}</div>
+                <div class="lb-stats">P:${p.played || 0} · W:${p.wins || 0} · D:${p.draws || 0} · Win%:${p.winPct || 0}%</div>
+              </div>
+              <div class="lb-pts">${p.points || 0}</div>
+            </div>
+          `).join('')}
+        </div>`;
+      })() : '<div class="empty-state"><div class="empty-icon">📊</div><div>No players yet</div></div>'}
+    </div>
+    <div style="height:24px"></div>
+  `;
+  // Re-apply any active search query after re-render (e.g. on live update)
+  const q = document.getElementById('lb-search');
+  if (q && q.value) filterLeaderboard(q.value);
+}
+
+function filterLeaderboard(query) {
+  const rows = document.querySelectorAll('#lb-list .lb-row');
+  const q = query.trim().toLowerCase();
+  let anyVisible = false;
+  rows.forEach(row => {
+    const name = row.getAttribute('data-name') || '';
+    const match = !q || name.includes(q);
+    row.style.display = match ? '' : 'none';
+    if (match) anyVisible = true;
+  });
+  // Show/hide empty state
+  let emptyEl = document.getElementById('lb-empty-search');
+  if (!anyVisible && q) {
+    if (!emptyEl) {
+      emptyEl = document.createElement('div');
+      emptyEl.id = 'lb-empty-search';
+      emptyEl.className = 'empty-state text-muted';
+      emptyEl.style.cssText = 'padding:20px 0;font-size:13px';
+      emptyEl.textContent = 'No player found';
+      const list = document.getElementById('lb-list');
+      if (list) list.parentNode.insertBefore(emptyEl, list.nextSibling);
+    }
+    emptyEl.style.display = '';
+  } else if (emptyEl) {
+    emptyEl.style.display = 'none';
+  }
+}
+
+// ======================= PLAYER DETAIL =======================
+function openPlayerDetail(pid) {
+  const p = PLAYERS.find(x => x.id === pid);
+  if (!p) return;
+
+  // ── DIAGNOSTIC LOG ──────────────────────────────────────────────────
+  console.group('[PlayerDetail] Opening player detail');
+  console.log('  players-doc ID  :', pid);
+  console.log('  name            :', p.name);
+  console.log('  uid field       :', p.uid !== undefined ? p.uid : '⚠️  MISSING (not set in players doc)');
+  console.log('  Full players doc:', JSON.stringify(p, null, 2));
+  console.log('  Lookup path that will be used:',
+    p.uid ? `UID → users/${p.uid}` : `NAME query → users where name == "${p.name}"`);
+  console.groupEnd();
+  // ────────────────────────────────────────────────────────────────────
+
+  // Recent Form — last 7 finished matches for this player
+  const recentForms = MATCHES_RECENT.filter(m =>
+    m.player1 === p.name || m.player2 === p.name
+  ).slice(0, 7).map(m => {
+    const isP1 = m.player1 === p.name;
+    const parts = (m.score || '0-0').split('-');
+    const s1 = parseInt(parts[0]) || 0;
+    const s2 = parseInt(parts[1]) || 0;
+    const myScore = isP1 ? s1 : s2;
+    const theirScore = isP1 ? s2 : s1;
+    return {
+      result: myScore > theirScore ? 'W' : myScore < theirScore ? 'L' : 'D',
+      myScore, theirScore,
+      opponent: isP1 ? (m.player2 || '?') : (m.player1 || '?')
+    };
+  });
+
+  // Titles Won — manually set by admin on the player doc (tournament-specific)
+  // Filter out auto-generated stat achievements; admin-set ones have custom titles
+  const autoTitles = new Set(['Champion','Hat-trick Hero','Wall of Defense','Dominant Force','Veteran','Community Member']);
+  const titlesWon = (p.achievements || []).filter(a => !autoTitles.has(a.title));
+
+  pushView('view-player-detail', el => {
+    // [FIXED] Compute rank from the live-sorted list, not the raw Firestore order.
+    // PLAYERS is ordered by the admin-written rank field which can be stale.
+    const _sorted = getSortedPlayers();
+    const rank = _sorted.findIndex(x => x.id === p.id) + 1;
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <div style="padding:10px 12px 0">
+          <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;padding:14px 16px 12px;background:var(--bg-primary)">
+          <img class="player-hero-avatar" src="${p.avatar || DEFAULT_AVATAR}" alt="${escHtml(p.name)}" onerror="this.src=DEFAULT_AVATAR">
+          <div class="player-hero-name">${escHtml(p.name)}</div>
+          <div class="player-hero-rank">Rank #${rank} · ${p.points || 0} pts</div>
+        </div>
+        <div style="padding: 0 16px; margin-top: 4px">
+          <!-- Player Info Toggle Section -->
+          <div style="margin-bottom:16px">
+            <div class="pi-toggle-header" onclick="togglePlayerInfoSection()">
+              <span class="pi-toggle-header-label">Player Info</span>
+              <svg id="pi-toggle-chev" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--text-muted);fill:none;stroke-width:2.5;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div id="pi-toggle-body" class="pi-toggle-body" style="display:none">
+              <div id="pi-info-content" style="padding-top:6px">
+                <div style="text-align:center;padding:10px 0;font-size:12px;color:var(--text-muted)"><span class="spinner"></span>Loading…</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-label" style="padding:0;margin-bottom:8px">Detailed Stats</div>
+          <div class="stats-mini-grid">
+            <div class="smg-cell">
+              <div class="smg-val">${p.played || 0}</div>
+              <div class="smg-lbl">Played</div>
+            </div>
+            <div class="smg-cell">
+              <div class="smg-val">${p.wins || 0}</div>
+              <div class="smg-lbl">Wins</div>
+            </div>
+            <div class="smg-cell">
+              <div class="smg-val">${p.draws || 0}</div>
+              <div class="smg-lbl">Draws</div>
+            </div>
+            <div class="smg-cell">
+              <div class="smg-val">${p.goals || 0}</div>
+              <div class="smg-lbl">Goals</div>
+            </div>
+            <div class="smg-divider"></div>
+            <div class="smg-cell">
+              <div class="smg-val">${p.hatTricks || 0}</div>
+              <div class="smg-lbl">Hat-tricks</div>
+            </div>
+            <div class="smg-cell">
+              <div class="smg-val">${p.cleanSheets || 0}</div>
+              <div class="smg-lbl">Clean Sheets</div>
+            </div>
+            <div class="smg-cell">
+              <div class="smg-val">${p.winPct || 0}%</div>
+              <div class="smg-lbl">Win Rate</div>
+            </div>
+            <div class="smg-cell">
+              <div class="smg-val">${p.titles || 0}</div>
+              <div class="smg-lbl">Titles</div>
+            </div>
+          </div>
+
+          <div class="section-label" style="padding:0;margin-top:10px;margin-bottom:6px">Titles Won</div>
+          ${titlesWon.length > 0
+            ? titlesWon.map(a => {
+                const pos = (a.title || '').toLowerCase();
+                const cls = pos.includes('champion') ? 'champion' : pos.includes('runner') || pos.includes('2nd') ? 'runner' : pos.includes('3rd') || pos.includes('third') ? 'third' : 'champion';
+                const icon = cls === 'champion' ? '🏆' : cls === 'runner' ? '🥈' : '🥉';
+                return `<div class="title-pill">
+                  <span class="title-pill-icon">${icon}</span>
+                  <span class="title-pill-name">${escHtml(a.desc || a.title)}</span>
+                  <span class="title-pill-pos ${cls}">${escHtml(a.title)}</span>
+                </div>`;
+              }).join('')
+            : (p.titles > 0
+                ? `<div class="title-pill"><span class="title-pill-icon">🏆</span><span class="title-pill-name">Tournament Winner</span><span class="title-pill-pos champion">Champion ×${p.titles}</span></div>`
+                : `<div style="font-size:12px;color:var(--text-muted);padding:6px 0 2px">No titles yet</div>`
+              )
+          }
+
+          <div class="section-label" style="padding:0;margin-top:10px;margin-bottom:6px">Recent Form</div>
+          ${recentForms.length > 0
+            ? `<div class="recent-form-row">${recentForms.map(f => `
+                <div class="rf-pill ${f.result}">
+                  <span class="rf-pill-badge">${f.result}</span>
+                  <span class="rf-pill-score">${f.myScore}–${f.theirScore}</span>
+                  <span class="rf-pill-opp">vs ${escHtml(f.opponent)}</span>
+                </div>`).join('')}</div>`
+            : `<div style="font-size:12px;color:var(--text-muted);padding:6px 0 2px">No recent matches</div>`
+          }
+          <div style="height:20px"></div>
+        </div>
+      </div>
+    `;
+    fetchPlayerInfoForDetail(p.uid || null, p.name);
+  });
+}
+
+function getAchievements(p) {
+  const a = [];
+  if ((p.titles || 0) >= 1) a.push({ icon: '🏆', title: 'Champion', desc: `Won ${p.titles} title${p.titles > 1 ? 's' : ''}` });
+  if ((p.hatTricks || 0) >= 1) a.push({ icon: '⚽', title: 'Hat-trick Hero', desc: `${p.hatTricks} hat-trick${p.hatTricks > 1 ? 's' : ''}` });
+  if ((p.cleanSheets || 0) >= 5) a.push({ icon: '🧤', title: 'Wall of Defense', desc: `${p.cleanSheets} clean sheets` });
+  if ((p.winPct || 0) >= 70) a.push({ icon: '🔥', title: 'Dominant Force', desc: 'Win rate above 70%' });
+  if ((p.played || 0) >= 25) a.push({ icon: '🎖', title: 'Veteran', desc: `${p.played} matches played` });
+  if (a.length === 0) a.push({ icon: '⭐', title: 'Community Member', desc: 'Active in Winning Eleven' });
+  return a;
+}
+
+// ======================= PLAYER DETAIL BY NAME (Feature 1) =======================
+function openPlayerDetailByName(name) {
+  if (!name) return;
+  const p = PLAYERS.find(x => x.name === name);
+  if (p) { openPlayerDetail(p.id); return; }
+  // Fallback: fetch from Firestore if not cached yet
+  db.collection('players').where('name', '==', name).limit(1).get().then(snap => {
+    if (!snap.empty) {
+      const doc = snap.docs[0];
+      const pData = { id: doc.id, ...doc.data() };
+      if (!PLAYERS.find(x => x.id === pData.id)) PLAYERS.push(pData);
+      openPlayerDetail(pData.id);
+    } else {
+      showToast('Player stats not found');
+    }
+  }).catch(() => showToast('Could not load player stats'));
+}
+
+// ======================= PLAYER INFO TOGGLE (Feature 2) =======================
+function togglePlayerInfoSection() {
+  const body = document.getElementById('pi-toggle-body');
+  const chev = document.getElementById('pi-toggle-chev');
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chev) chev.innerHTML = isOpen
+    ? '<polyline points="6 9 12 15 18 9"/>'
+    : '<polyline points="18 15 12 9 6 15"/>';
+}
+
+// Session cache for fetchPlayerInfoForDetail: keyed by uid (preferred) or name.
+// Invalidated automatically when the user's own doc changes (onSnapshot).
+const _playerInfoCache = {};
+
+async function fetchPlayerInfoForDetail(playerUid, playerName) {
+  const el = document.getElementById('pi-info-content');
+  if (!el) return;
+  try {
+    let snap;
+
+    // [OPT v3] Check session cache first — avoids a Firestore read on every
+    // player-detail open. Cache is keyed by uid (preferred) or name (fallback).
+    const cacheKey = playerUid || ('name:' + playerName);
+    if (_playerInfoCache[cacheKey]) {
+      const cached = _playerInfoCache[cacheKey];
+      snap = cached.empty ? { empty: true, docs: [] } : { empty: false, docs: [{ data: () => cached.data }] };
+    } else {
+
+    if (playerUid) {
+      // Primary: look up user by Firebase UID (doc ID) — exact and collision-free
+      const doc = await db.collection('users').doc(playerUid).get();
+      snap = doc.exists ? { empty: false, docs: [doc] } : { empty: true, docs: [] };
+    } else {
+      // Fallback: query by name only when UID is not available
+      snap = await db.collection('users').where('name', '==', playerName).limit(1).get();
+    }
+
+    // Store in session cache so repeat opens cost 0 Firestore reads
+    _playerInfoCache[cacheKey] = snap.empty
+      ? { empty: true }
+      : { empty: false, data: snap.docs[0].data() };
+
+    } // end: else (not in cache)
+
+    const el2 = document.getElementById('pi-info-content');
+    if (!el2) return;
+
+    if (!snap.empty) {
+      const u = snap.docs[0].data();
+      const efid = u.efootballId || '';
+      const device = u.device || '';
+      const fb = u.facebookId || '';
+      const wa = u.whatsapp || '';
+
+      el2.innerHTML = `
+        <div class="info-row"><span class="info-key">eFootball User ID</span><span class="info-val" style="font-family:monospace;font-size:11px;word-break:break-all">${escHtml(efid) || '—'}</span></div>
+        <div class="info-row"><span class="info-key">Device Model</span><span class="info-val">${escHtml(device) || '—'}</span></div>
+        <div class="info-row"><span class="info-key">Facebook</span><span class="info-val">${fb ? `<a href="${escHtml(fb)}" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:underline;word-break:break-all">View Profile</a>` : '—'}</span></div>
+        <div class="info-row" style="border-bottom:none"><span class="info-key" style="display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:#25d366;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.554 4.118 1.528 5.851L0 24l6.295-1.507A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.797 9.797 0 01-5.028-1.382l-.36-.214-3.732.894.937-3.623-.235-.373A9.775 9.775 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>WhatsApp</span><span class="info-val">${wa ? `<a href="https://wa.me/${wa.replace(/[^0-9]/g,'')}" target="_blank" rel="noopener" style="color:#25d366;text-decoration:underline;word-break:break-all">${escHtml(wa)}</a>` : '—'}</span></div>
+      `;
+    } else {
+      el2.innerHTML = `<div style="padding:8px 0;font-size:12px;color:var(--text-muted);text-align:center">No player info on file</div>`;
+    }
+  } catch(e) {
+    const el3 = document.getElementById('pi-info-content');
+    if (el3) el3.innerHTML = `<div style="padding:8px 0;font-size:12px;color:var(--text-muted);text-align:center">Could not load info</div>`;
+  }
+}
+
+// ======================= PROFILE =======================
+function renderProfile() {
+  const el = document.getElementById('profile-content');
+  if (!currentUser) {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <div style="padding:16px 16px 0"><div style="font-size:20px;font-weight:800;color:var(--text-primary)">Profile</div></div>
+        <div style="padding: 40px 16px; text-align:center">
+          <div style="font-size:48px;margin-bottom:16px;opacity:0.4">👤</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text-secondary);margin-bottom:24px">Sign in to access your profile</div>
+          <div style="display:flex;gap:10px;justify-content:center">
+            <button class="btn btn-gold" onclick="openLogin()">LOGIN</button>
+            <button class="btn btn-outline" onclick="openSignup()">SIGN UP</button>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  // Always prefer Firestore (currentUserDoc) over localStorage so player info
+  // stays consistent across every device. Fall back to localStorage only when
+  // the Firestore doc hasn't loaded yet (e.g. first render before snapshot fires).
+  const pi = (currentUserDoc && (currentUserDoc.facebookId || currentUserDoc.efootballId || currentUserDoc.device || currentUserDoc.whatsapp))
+    ? { fb: currentUserDoc.facebookId, efid: currentUserDoc.efootballId, device: currentUserDoc.device, whatsapp: currentUserDoc.whatsapp }
+    : getPlayerInfo(currentUser.uid);
+  const stats = currentUserDoc && currentUserDoc.stats ? currentUserDoc.stats : {};
+  el.innerHTML = `
+    <div class="scroll-pad">
+      <div style="display:flex;flex-direction:column;align-items:center;padding:28px 16px 16px;background:var(--bg-primary)">
+        <img class="profile-avatar-large" src="${currentUser.avatar || DEFAULT_AVATAR}" alt="" onerror="this.src=DEFAULT_AVATAR" style="box-shadow:0 4px 14px rgba(0,0,0,0.45);margin-bottom:12px">
+        <div class="profile-name">${escHtml(currentUser.name)}</div>
+        <div class="profile-id">${escHtml(currentUser.email)}</div>
+        <button class="btn btn-outline btn-sm" style="margin-top:12px" onclick="openEditProfile()">Edit Profile</button>
+      </div>
+      <div style="padding: 0 16px">
+        <div class="card mt-12" onclick="openPlayerInfo()" style="cursor:pointer">
+          <div style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Player Info</div>
+              <div style="font-size:11px;color:${pi ? 'var(--gold-muted)' : '#c06060'};margin-top:2px">${pi ? 'Profile Complete' : 'Must Fill Up'}</div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <div class="section-label" style="padding:0;margin-top:20px;margin-bottom:8px">My Statistics</div>
+        <div class="card">
+          <div class="card-body" style="padding:12px 16px">
+            <div class="stats-row" style="margin-bottom:8px">
+              <div class="stat-box"><div class="stat-val">${stats.matches || 0}</div><div class="stat-label">Matches</div></div>
+              <div class="stat-box"><div class="stat-val">${stats.wins || 0}</div><div class="stat-label">Wins</div></div>
+              <div class="stat-box"><div class="stat-val">${stats.winRate ? stats.winRate + '%' : '0%'}</div><div class="stat-label">Win Rate</div></div>
+            </div>
+            <div class="stats-row">
+              <div class="stat-box"><div class="stat-val">${stats.rank ? '#' + stats.rank : '—'}</div><div class="stat-label">Rank</div></div>
+              <div class="stat-box"><div class="stat-val">${stats.hatTricks || 0}</div><div class="stat-label">Hat-tricks</div></div>
+              <div class="stat-box"><div class="stat-val">${stats.cleanSheets || 0}</div><div class="stat-label">Clean Sheets</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-12" onclick="openMatchHistory()" style="cursor:pointer">
+          <div style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Match History</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${getUserMatchCount()} matches recorded</div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <div class="section-label" style="padding:0;margin-top:20px;margin-bottom:8px">Settings</div>
+        <div class="card">
+          <div class="setting-item" onclick="toggleNotif(this)">
+            <div class="setting-item-left">
+              <div class="setting-item-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+              <div><div class="setting-item-label">Notifications</div></div>
+            </div>
+            <div class="toggle-switch ${getNotifSetting() ? 'on' : ''}" id="notif-toggle"></div>
+          </div>
+          <div class="setting-item">
+            <div class="setting-item-left">
+              <div class="setting-item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+              <div><div class="setting-item-label">Language</div><div class="setting-item-sub">English</div></div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="setting-item" onclick="openContact()">
+            <div class="setting-item-left">
+              <div class="setting-item-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+              <div><div class="setting-item-label">Contact Support Team</div></div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="setting-item" onclick="openMatchRules()" style="border-bottom:none">
+            <div class="setting-item-left">
+              <div class="setting-item-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+              <div><div class="setting-item-label">Match Rules</div></div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <button class="settings-logout-btn" onclick="logout()">
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:#c06060;fill:none;stroke-width:2;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleNotif(el) {
+  const t = document.getElementById('notif-toggle');
+  const cur = getNotifSetting();
+  setNotifSetting(!cur);
+  if (!cur) t.classList.add('on'); else t.classList.remove('on');
+  showToast('Notifications ' + (!cur ? 'enabled' : 'disabled'));
+}
+
+function openEditProfile() {
+  pushView('view-edit-profile', el => {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="page-title">Edit Profile</div>
+        <div style="padding: 0 16px">
+          <div style="text-align:center;margin-bottom:20px">
+            <img id="ep-preview" src="${currentUser.avatar || DEFAULT_AVATAR}" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2.5px solid var(--gold-muted)" onerror="this.src=DEFAULT_AVATAR">
+          </div>
+          <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="ep-name" value="${escHtml(currentUser.name)}" type="text"></div>
+          <div class="form-group"><label class="form-label">Profile Picture URL</label><input class="form-input" id="ep-avatar" value="${escHtml(currentUser.avatar || '')}" placeholder="https://..." type="url" oninput="document.getElementById('ep-preview').src=this.value||'https://i.pravatar.cc/100?img=30'"></div>
+          <div id="ep-error" style="color:#e07070;font-size:12px;margin-bottom:10px;display:none"></div>
+          <button class="btn btn-gold btn-full" id="ep-btn" onclick="doEditProfile()">Save Changes</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function doEditProfile() {
+  const name = document.getElementById('ep-name').value.trim();
+  const avatar = document.getElementById('ep-avatar').value.trim();
+  const errEl = document.getElementById('ep-error');
+  if (!name) { errEl.textContent = 'Name cannot be empty'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('ep-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const oldName = currentUser.name;
+  const nameChanged = name !== oldName;
+
+  try {
+    await db.collection('users').doc(currentUser.uid).update({ name, avatar });
+    await auth.currentUser.updateProfile({ displayName: name });
+    currentUser.name = name;
+    currentUser.avatar = avatar;
+    updateHeader();
+    showToast('Profile updated');
+    goBack();
+
+    // Sync the new name everywhere in Firestore (fire-and-forget — non-blocking)
+    if (nameChanged) {
+      (async () => {
+        try {
+          const batch = db.batch();
+          // 1. Update leaderboard (players collection)
+          const playerSnap = await db.collection('players').where('uid', '==', currentUser.uid).limit(1).get();
+          if (!playerSnap.empty) batch.update(playerSnap.docs[0].ref, { name });
+          // 2. Update all tournament registrations for this user
+          const regSnap = await db.collection('registrations').where('uid', '==', currentUser.uid).get();
+          regSnap.docs.forEach(d => batch.update(d.ref, { playerName: name }));
+          // 3. Update match display-name fields (player1 / player2 text)
+          const [m1Snap, m2Snap] = await Promise.all([
+            db.collection('matches').where('player1', '==', oldName).get(),
+            db.collection('matches').where('player2', '==', oldName).get()
+          ]);
+          m1Snap.docs.forEach(d => batch.update(d.ref, { player1: name }));
+          m2Snap.docs.forEach(d => batch.update(d.ref, { player2: name }));
+          await batch.commit();
+        } catch(e) {
+          console.warn('[Profile] Name sync error:', e);
+        }
+      })();
+    }
+    // Always sync avatar to the players leaderboard entry (fire-and-forget)
+    (async () => {
+      try {
+        const cpSnap = await db.collection('players').where('uid', '==', currentUser.uid).limit(1).get();
+        if (!cpSnap.empty) await cpSnap.docs[0].ref.update({ avatar });
+      } catch(e) { console.warn('[Profile] Avatar sync:', e); }
+    })();
+  } catch(e) {
+    errEl.textContent = 'Failed to update profile. Please try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
+}
+
+function openPlayerInfo() {
+  // Read from Firestore (currentUserDoc) as the source of truth so every device
+  // shows the latest saved data. Fall back to localStorage only if the snapshot
+  // hasn't arrived yet (race condition on very first page load).
+  const firestoreInfo = currentUserDoc ? {
+    fb: currentUserDoc.facebookId || '',
+    efid: currentUserDoc.efootballId || '',
+    device: currentUserDoc.device || '',
+    whatsapp: currentUserDoc.whatsapp || ''
+  } : null;
+  const pi = (firestoreInfo && (firestoreInfo.fb || firestoreInfo.efid || firestoreInfo.device || firestoreInfo.whatsapp))
+    ? firestoreInfo
+    : (getPlayerInfo(currentUser.uid) || {});
+  const locked = !!(APP_SETTINGS && APP_SETTINGS.playerInfoLocked);
+  pushView('view-player-info', el => {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="page-title">Player Info</div>
+        <div class="page-subtitle" style="margin-bottom:16px">${locked ? 'Read-Only — Editing is currently disabled' : 'Must Fill Up — Required for tournaments'}</div>
+        <div style="padding: 0 16px">
+          ${locked
+            ? `<div class="notice" style="margin-bottom:16px;border-color:#e07070;background:#e0707011"><div class="notice-text" style="color:#e07070">🔒 Player Info editing has been temporarily locked by the admin. Your saved information is still visible below.</div></div>`
+            : `<div class="notice" style="margin-bottom:16px"><div class="notice-text">All fields are required to participate in tournaments. You can edit this information at any time.</div></div>`
+          }
+          <div class="form-group"><label class="form-label">Facebook Profile Link</label><input class="form-input" id="pi-fb" value="${escHtml(pi.fb || '')}" placeholder="https://facebook.com/yourprofile" type="url"${locked ? ' readonly disabled style="opacity:0.6;cursor:not-allowed;"' : ''}></div>
+          <div class="form-group"><label class="form-label">eFootball User ID</label><input class="form-input" id="pi-efid" value="${escHtml(pi.efid || '')}" placeholder="Your eFootball User ID"${locked ? ' readonly disabled style="opacity:0.6;cursor:not-allowed;"' : ''}></div>
+          <div class="form-group"><label class="form-label">Device Model</label><input class="form-input" id="pi-device" value="${escHtml(pi.device || '')}" placeholder="e.g. Samsung Galaxy S24"${locked ? ' readonly disabled style="opacity:0.6;cursor:not-allowed;"' : ''}></div>
+          <div class="form-group"><label class="form-label">WhatsApp Number</label><input class="form-input" id="pi-whatsapp" value="${escHtml(pi.whatsapp || '')}" placeholder="e.g. +8801XXXXXXXXX" type="tel"${locked ? ' readonly disabled style="opacity:0.6;cursor:not-allowed;"' : ''}></div>
+          ${locked ? '' : '<button class="btn btn-gold btn-full mt-8" onclick="doSavePlayerInfo()">Save Info</button>'}
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function doSavePlayerInfo() {
+  if (APP_SETTINGS && APP_SETTINGS.playerInfoLocked) {
+    showToast('Player Info editing is currently locked by the admin');
+    return;
+  }
+  const fb = document.getElementById('pi-fb').value.trim();
+  const efid = document.getElementById('pi-efid').value.trim();
+  const device = document.getElementById('pi-device').value.trim();
+  const whatsapp = document.getElementById('pi-whatsapp').value.trim();
+  if (!fb || !efid || !device || !whatsapp) { showToast('All fields are required'); return; }
+  // Write to Firestore first — it is the shared source of truth across devices.
+  // Only update localStorage after Firestore confirms the write so both stores
+  // always reflect the same value. currentUserDoc's onSnapshot will also fire
+  // and update the UI automatically on every device that is currently open.
+  if (currentUser && currentUser.uid) {
+    try {
+      await db.collection('users').doc(currentUser.uid).update({ facebookId: fb, efootballId: efid, device, whatsapp });
+      savePlayerInfo(currentUser.uid, { fb, efid, device, whatsapp });
+    } catch(e) {
+      showToast('Failed to save. Please try again.');
+      return;
+    }
+  }
+  showToast('Player info saved');
+  goBack();
+}
+
+function openContact() {
+  const s = APP_SETTINGS;
+  pushView('view-contact', el => {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="page-title">Contact Support</div>
+        <div class="page-subtitle" style="margin-bottom:16px">Reach us on your preferred platform</div>
+        <div style="padding: 0 16px">
+          <div class="card">
+            <a class="contact-link" href="${s.supportFacebook || 'https://facebook.com'}" target="_blank">
+              <div class="contact-link-icon" style="background:#1877f2">📘</div>
+              <div><div class="contact-link-label">Facebook</div><div style="font-size:11px;color:var(--text-muted)">Message us on Facebook</div></div>
+            </a>
+            <a class="contact-link" href="${s.supportWhatsapp || 'https://wa.me/8801858213981'}" target="_blank">
+              <div class="contact-link-icon" style="background:#25d366">💬</div>
+              <div><div class="contact-link-label">WhatsApp</div><div style="font-size:11px;color:var(--text-muted)">Chat on WhatsApp</div></div>
+            </a>
+            <a class="contact-link" href="${s.supportTelegram || 'https://t.me/fcwinningeleven'}" target="_blank" style="border-bottom:none">
+              <div class="contact-link-icon" style="background:#0088cc">✈️</div>
+              <div><div class="contact-link-label">Telegram</div><div style="font-size:11px;color:var(--text-muted)">Join our Telegram</div></div>
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+// [UPDATED] Returns count of matches involving the current user only
+function getUserMatchCount() {
+  if (!currentUser) return 0;
+  var userUid = currentUser.uid;
+  var userName = currentUser.name;
+  var fromMatches = MATCHES_RECENT.filter(function(m) {
+    return (userUid && (m.player1Id === userUid || m.player2Id === userUid)) ||
+           (m.player1 === userName || m.player2 === userName);
+  });
+  var fromHistory = (currentUserDoc && currentUserDoc.matchHistory) ? currentUserDoc.matchHistory : [];
+  var seenIds = {};
+  fromMatches.forEach(function(m) { if (m.id) seenIds[m.id] = true; });
+  var combined = fromMatches.concat(fromHistory.filter(function(m) { return !seenIds[m.id]; }));
+  return combined.length;
+}
+
+// [FIXED] Shows ONLY the logged-in user's matches, not all global matches
+function openMatchHistory() {
+  if (!currentUser) return;
+  var userUid = currentUser.uid;
+  var userName = currentUser.name;
+
+  // Filter to only matches involving this user — prefer UID, fallback to name
+  var myGlobalMatches = MATCHES_RECENT.filter(function(m) {
+    return (userUid && (m.player1Id === userUid || m.player2Id === userUid)) ||
+           (m.player1 === userName || m.player2 === userName);
+  });
+
+  // Also merge admin-added matchHistory from user's Firestore doc
+  var adminHistory = (currentUserDoc && currentUserDoc.matchHistory) ? currentUserDoc.matchHistory : [];
+  var seenIds = {};
+  myGlobalMatches.forEach(function(m) { if (m.id) seenIds[m.id] = true; });
+  var allMyMatches = myGlobalMatches.concat(adminHistory.filter(function(m) { return !seenIds[m.id]; }));
+
+  // match.player1Id / player2Id store the players-collection Firestore doc ID,
+  // NOT the Firebase UID. Look up the current user's players-doc ID once so the
+  // isP1 check inside the map is correct.
+  var myPlayerDocId = null;
+  if (typeof PLAYERS !== 'undefined' && PLAYERS) {
+    var myPlayerEntry = PLAYERS.find(function(p) { return p.uid === userUid; });
+    if (myPlayerEntry) myPlayerDocId = myPlayerEntry.id;
+  }
+
+  pushView('view-match-rules', function(el) {
+    var rows = allMyMatches.map(function(m, i) {
+      var parts = (m.score || '0-0').split('-');
+      var s1 = parseInt(parts[0], 10) || 0;
+      var s2 = parseInt(parts[1], 10) || 0;
+      // Primary: compare players-collection doc IDs; fallback to name only when unavailable
+      var isP1 = (myPlayerDocId && m.player1Id === myPlayerDocId) ||
+                 (!myPlayerDocId && m.player1 === userName);
+      var myScore = isP1 ? s1 : s2;
+      var oppScore = isP1 ? s2 : s1;
+      var isDraw = myScore === oppScore;
+      var isWin = myScore > oppScore;
+      var resultColor = isDraw ? 'var(--text-muted)' : isWin ? '#4caf50' : '#e07070';
+      var resultLabel = isDraw ? 'Draw' : isWin ? 'Win' : 'Loss';
+      var border = i < allMyMatches.length - 1 ? 'border-bottom:1px solid var(--border)' : '';
+      var extra = (m.notes || m.details) ? '<div style="font-size:10px;color:var(--text-muted);margin-top:3px">' + escHtml(m.notes || m.details) + '</div>' : '';
+      return '<div style="padding:13px 14px;' + border + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+          '<span style="font-size:10px;color:var(--gold-muted);font-weight:700;letter-spacing:0.5px">' + escHtml(m.tournament || '') + '</span>' +
+          '<div style="display:flex;gap:6px;align-items:center">' +
+            '<span style="font-size:10px;font-weight:700;color:' + resultColor + ';background:' + resultColor + '22;border:1px solid ' + resultColor + '44;border-radius:3px;padding:1px 6px">' + resultLabel + '</span>' +
+            '<span style="font-size:10px;color:var(--text-muted)">' + (m.date || '') + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center">' +
+          '<span style="font-size:13px;font-weight:600;color:var(--text-primary)">' + escHtml(m.player1 || '—') + ' vs ' + escHtml(m.player2 || '—') + '</span>' +
+          '<span style="font-size:15px;font-weight:800;color:var(--gold-light)">' + s1 + ' – ' + s2 + '</span>' +
+        '</div>' +
+        extra +
+      '</div>';
+    }).join('');
+
+    el.innerHTML =
+      '<div class="scroll-pad">' +
+        '<button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>' +
+        '<div class="page-title">Match History</div>' +
+        '<div class="page-subtitle" style="margin-bottom:16px">' + allMyMatches.length + ' match' + (allMyMatches.length !== 1 ? 'es' : '') + ' recorded</div>' +
+        '<div style="padding: 0 16px"><div class="card">' +
+          (allMyMatches.length ? rows : '<div class="card-body text-muted" style="padding:16px">No matches found for your account</div>') +
+        '</div></div>' +
+      '</div>';
+  });
+}
+
+function openMatchRules() {
+  const rules = APP_SETTINGS.matchRules || '';
+  pushView('view-match-rules', el => {
+    el.innerHTML = `
+      <div class="scroll-pad">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="page-title">Match Rules</div>
+        <div class="page-subtitle" style="margin-bottom:4px">Winning Eleven Official Rulebook</div>
+        <div>
+          ${rules ? `
+            <div class="rule-section">
+              <div class="rule-section-title">Official Rules</div>
+              <div class="rule-text" style="white-space:pre-line">${escHtml(rules)}</div>
+            </div>
+          ` : `
+            <div class="rule-section">
+              <div class="rule-section-title">General Rules</div>
+              <ul class="rule-list">
+                <li>All matches must be played on the scheduled date and time.</li>
+                <li>Players must be logged into eFootball before the match starts.</li>
+                <li>Disconnections must be reported immediately with screenshot proof.</li>
+                <li>Unsportsmanlike conduct will result in disqualification.</li>
+                <li>Results must be submitted within 30 minutes after match completion.</li>
+              </ul>
+            </div>
+            <div class="rule-section">
+              <div class="rule-section-title">Match Settings</div>
+              <ul class="rule-list">
+                <li>Match duration: 10 minutes (default eFootball setting).</li>
+                <li>All team selections are allowed.</li>
+                <li>No restrictions on formation or tactics.</li>
+                <li>Weather and stadium are set by the host player.</li>
+              </ul>
+            </div>
+            <div class="rule-section">
+              <div class="rule-section-title">Tournament Format</div>
+              <ul class="rule-list">
+                <li>Group stage: Round-robin format, top 2 advance.</li>
+                <li>Knockout stage: Single elimination.</li>
+                <li>Points system: Win = 3pts, Draw = 1pt, Loss = 0pts.</li>
+                <li>Tiebreaker: Goal difference, then goals scored.</li>
+              </ul>
+            </div>
+            <div class="rule-section">
+              <div class="rule-section-title">Fair Play Policy</div>
+              <ul class="rule-list">
+                <li>Intentional lag or connection manipulation is banned.</li>
+                <li>Account sharing is strictly prohibited.</li>
+                <li>All disputes must be raised within 24 hours of the match.</li>
+                <li>The admin team's decision on disputes is final.</li>
+              </ul>
+            </div>
+            <div class="rule-section" style="border-bottom:none">
+              <div class="rule-section-title">Prizepool Distribution</div>
+              <ul class="rule-list">
+                <li>1st Place: 60% of total prizepool.</li>
+                <li>2nd Place: 25% of total prizepool.</li>
+                <li>3rd Place: 15% of total prizepool.</li>
+                <li>Payments processed within 72 hours via bKash/Nagad.</li>
+              </ul>
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  });
+}
+
+// ======================= INIT =======================
+function init() {
+  setupRealtimeListeners();
+  renderHome();
+}
+
+init();
+</script>
+</body>
+</html>
